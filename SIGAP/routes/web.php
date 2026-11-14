@@ -27,4 +27,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('wilayah', WilayahKarhutlaController::class);
 });
 
+Route::get('/pusdalops/dashboard', function () {
+    return view('petugas.pusdalops.dashboard');
+})->name('pusdalops.dashboard');
+
 require __DIR__.'/auth.php';
