@@ -15,14 +15,12 @@
             ['label' => 'Rekapitulasi Kejadian', 'icon' => 'bi-bar-chart'],
         ],
         'damkar' => [
-            ['label' => 'Dashboard', 'icon' => 'bi-speedometer2'],
-            ['label' => 'Tugas Penanganan', 'icon' => 'bi-clipboard-check'],
+            ['label' => 'Dashboard', 'icon' => 'bi-speedometer2', 'route' => 'damkar.dashboard'],            ['label' => 'Tugas Penanganan', 'icon' => 'bi-clipboard-check'],
             ['label' => 'Update Status Penanganan', 'icon' => 'bi-arrow-repeat'],
             ['label' => 'Hasil Penanganan', 'icon' => 'bi-file-check'],
         ],
         'rr' => [
-            ['label' => 'Dashboard', 'icon' => 'bi-speedometer2'],
-            ['label' => 'Data Kerusakan Lahan', 'icon' => 'bi-tree'],
+            ['label' => 'Dashboard', 'icon' => 'bi-speedometer2', 'route' => 'rr.dashboard'],            ['label' => 'Data Kerusakan Lahan', 'icon' => 'bi-tree'],
             ['label' => 'Rehabilitasi Lahan', 'icon' => 'bi-flower1'],
             ['label' => 'Peta Persebaran', 'icon' => 'bi-map'],
         ],

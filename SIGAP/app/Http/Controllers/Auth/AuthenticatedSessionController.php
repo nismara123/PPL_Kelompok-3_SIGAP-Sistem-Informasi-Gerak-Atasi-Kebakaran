@@ -32,9 +32,9 @@ class AuthenticatedSessionController extends Controller
         $user = $request->user();
 
         return match ($user->role) {
-            'pusdalops' => redirect('/login-berhasil'),
-            'damkar' => redirect('/login-berhasil'),
-            'rr' => redirect('/login-berhasil'),
+            'pusdalops' => redirect()->route('pusdalops.dashboard'),
+            'damkar' => redirect()->route('damkar.dashboard'),
+            'rr' => redirect()->route('rr.dashboard'),
             default => redirect('/login'),
         };
     }
