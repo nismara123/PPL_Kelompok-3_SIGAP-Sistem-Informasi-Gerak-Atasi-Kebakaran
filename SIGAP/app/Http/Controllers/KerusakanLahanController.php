@@ -30,16 +30,16 @@ class KerusakanLahanController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        $ringkasan = [
+                $stat = [
             'total' => KerusakanLahan::count(),
             'luas' => (float) KerusakanLahan::sum('luas_ha'),
-            'kecamatan' => KerusakanLahan::join('wilayah_karhutla', 'wilayah_karhutla.id', '=', 'kerusakan_lahan.wilayah_id')
+            'wilayah' => KerusakanLahan::join('wilayah_karhutla', 'wilayah_karhutla.id', '=', 'kerusakan_lahan.wilayah_id')
                 ->distinct()
                 ->count('wilayah_karhutla.kecamatan'),
         ];
 
         return view('kerusakan_lahan.index', [
-            'ringkasan' => $ringkasan,
+            'stat' => $stat,
             'data' => $data,
             'kecamatanList' => WilayahKarhutla::orderBy('kecamatan')->distinct()->pluck('kecamatan'),
             'bisaKelola' => auth()->user()->role === 'rr',

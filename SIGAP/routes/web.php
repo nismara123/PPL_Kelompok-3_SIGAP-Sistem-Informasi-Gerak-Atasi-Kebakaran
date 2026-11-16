@@ -39,4 +39,5 @@ Route::get('/rr/dashboard', function () {
     return view('petugas.rr.dashboard');
 })->middleware('auth')->name('rr.dashboard');
 
+require __DIR__.'/fsi02.php';
 require __DIR__.'/auth.php';
