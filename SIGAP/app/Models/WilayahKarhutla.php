@@ -2,11 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class WilayahKarhutla extends Model
 {
+    use HasFactory;
+
     protected $table = 'wilayah_karhutla';
+
+    protected $primaryKey = 'id';
 
     protected $fillable = [
         'kode_wilayah',

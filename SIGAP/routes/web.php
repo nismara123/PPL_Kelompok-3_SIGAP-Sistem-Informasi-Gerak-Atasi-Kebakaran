@@ -27,4 +27,16 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('wilayah', WilayahKarhutlaController::class);
 });
 
+Route::get('/pusdalops/dashboard', function () {
+    return view('petugas.pusdalops.dashboard');
+})->name('pusdalops.dashboard');
+
+Route::get('/damkar/dashboard', function () {
+    return view('petugas.damkar.dashboard');
+})->middleware('auth')->name('damkar.dashboard');
+
+Route::get('/rr/dashboard', function () {
+    return view('petugas.rr.dashboard');
+})->middleware('auth')->name('rr.dashboard');
+
 require __DIR__.'/auth.php';

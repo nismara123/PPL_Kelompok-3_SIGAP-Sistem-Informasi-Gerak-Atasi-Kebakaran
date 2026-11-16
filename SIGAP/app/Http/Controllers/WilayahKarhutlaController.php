@@ -2,29 +2,36 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\WilayahKarhutla;
+use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 use Illuminate\Support\Str;
-
 
 class WilayahKarhutlaController extends Controller
 {
-    // Menampilkan daftar wilayah
-    public function index()
+    /**
+     * Menampilkan daftar seluruh wilayah karhutla.
+     */
+    public function index(): View
     {
         $wilayah = WilayahKarhutla::latest()->get();
 
         return view('wilayah.index', compact('wilayah'));
     }
 
-    // Menampilkan form tambah wilayah
-    public function create()
+    /**
+     * Menampilkan form tambah wilayah.
+     */
+    public function create(): View
     {
         return view('wilayah.create');
     }
 
-    // Menyimpan data wilayah
-    public function store(Request $request)
+    /**
+     * Menyimpan data wilayah baru.
+     */
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'kode_kabupaten' => 'required|string|max:20',
@@ -41,28 +48,35 @@ class WilayahKarhutlaController extends Controller
 
         WilayahKarhutla::create($validated);
 
-        return redirect()->route('wilayah.index')
+        return redirect()
+            ->route('wilayah.index')
             ->with('success', 'Data wilayah berhasil ditambahkan.');
     }
 
-    // Menampilkan detail wilayah
-    public function show($id)
+    /**
+     * Menampilkan detail wilayah berdasarkan ID.
+     */
+    public function show(int $id): View
     {
         $wilayah = WilayahKarhutla::findOrFail($id);
 
         return view('wilayah.show', compact('wilayah'));
     }
 
-    // Menampilkan form edit
-    public function edit($id)
+    /**
+     * Menampilkan form edit wilayah.
+     */
+    public function edit(int $id): View
     {
         $wilayah = WilayahKarhutla::findOrFail($id);
 
         return view('wilayah.edit', compact('wilayah'));
     }
 
-    // Memperbarui data wilayah
-    public function update(Request $request, $id)
+    /**
+     * Memperbarui data wilayah.
+     */
+    public function update(Request $request, int $id): RedirectResponse
     {
         $validated = $request->validate([
             'kode_kabupaten' => 'required|string|max:20',
@@ -78,7 +92,8 @@ class WilayahKarhutlaController extends Controller
         $wilayah = WilayahKarhutla::findOrFail($id);
         $wilayah->update($validated);
 
-        return redirect()->route('wilayah.index')
+        return redirect()
+            ->route('wilayah.index')
             ->with('success', 'Data wilayah berhasil diperbarui.');
     }
 }
