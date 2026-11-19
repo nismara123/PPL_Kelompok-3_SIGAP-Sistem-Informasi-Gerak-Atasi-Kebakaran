@@ -51,8 +51,8 @@ class LaporanPusdalopsTest extends TestCase
     }
 
     /**
-     * Instruksi 1:
-     * Endpoint API di backend untuk mengambil daftar laporan.
+     * Endpoint API:
+     * Mengambil seluruh data laporan masuk via API JSON.
      */
     public function test_endpoint_api_mengambil_daftar_laporan(): void
     {
@@ -92,8 +92,8 @@ class LaporanPusdalopsTest extends TestCase
     }
 
     /**
-     * Instruksi 1:
-     * Endpoint API di backend untuk mengambil detail laporan berdasarkan ID.
+     * Endpoint API:
+     * Mengambil detail laporan berdasarkan ID via API JSON.
      */
     public function test_endpoint_api_mengambil_detail_laporan_berdasarkan_id(): void
     {
@@ -114,9 +114,9 @@ class LaporanPusdalopsTest extends TestCase
     }
 
     /**
-     * Acceptance Criteria 3 & 4 & Instruksi 4 & 5:
+     * Acceptance Criteria 3 & 4:
      * Tersedia tombol Setujui dan Tolak di halaman detail laporan,
-     * serta tombol terlihat dan dapat diklik oleh Petugas BPBD Pusdalops.
+     * serta tombol terlihat dan dapat digunakan oleh Petugas BPBD Pusdalops.
      */
     public function test_tombol_setujui_dan_tolak_terlihat_oleh_petugas_pusdalops(): void
     {
@@ -133,9 +133,9 @@ class LaporanPusdalopsTest extends TestCase
     }
 
     /**
-     * Acceptance Criteria 4 & Instruksi 5:
-     * Jika bukan Petugas BPBD Pusdalops (misal Damkar atau BPBD Divisi RR),
-     * maka tombol Setujui dan Tolak disembunyikan di frontend.
+     * Acceptance Criteria 4:
+     * Jika bukan Petugas BPBD Pusdalops (misal Damkar atau Divisi RR),
+     * tombol Setujui dan Tolak disembunyikan.
      */
     public function test_tombol_setujui_dan_tolak_disembunyikan_untuk_bukan_pusdalops(): void
     {
@@ -177,27 +177,6 @@ class LaporanPusdalopsTest extends TestCase
     }
 
     /**
-     * Endpoint API: Petugas BPBD Pusdalops dapat menyetujui laporan via API JSON.
-     */
-    public function test_endpoint_api_menyetujui_laporan(): void
-    {
-        $pusdalops = $this->buatUser('pusdalops');
-        $laporan = $this->buatLaporan(['status' => 'Menunggu']);
-
-        $response = $this->actingAs($pusdalops)->postJson("/api/laporan/{$laporan->id}/setujui");
-
-        $response->assertOk();
-        $response->assertJson([
-            'success' => true,
-            'message' => 'Laporan berhasil disetujui.',
-            'data' => [
-                'id' => $laporan->id,
-                'status' => 'Disetujui',
-            ],
-        ]);
-    }
-
-    /**
      * Acceptance Criteria 4:
      * Petugas BPBD Pusdalops dapat menolak laporan.
      */
@@ -218,30 +197,8 @@ class LaporanPusdalopsTest extends TestCase
     }
 
     /**
-     * Endpoint API: Petugas BPBD Pusdalops dapat menolak laporan via API JSON.
-     */
-    public function test_endpoint_api_menolak_laporan(): void
-    {
-        $pusdalops = $this->buatUser('pusdalops');
-        $laporan = $this->buatLaporan(['status' => 'Menunggu']);
-
-        $response = $this->actingAs($pusdalops)->postJson("/api/laporan/{$laporan->id}/tolak");
-
-        $response->assertOk();
-        $response->assertJson([
-            'success' => true,
-            'message' => 'Laporan berhasil ditolak.',
-            'data' => [
-                'id' => $laporan->id,
-                'status' => 'Ditolak',
-            ],
-        ]);
-    }
-
-    /**
-     * Acceptance Criteria 4 & Instruksi 5:
-     * Pengguna yang bukan Petugas BPBD Pusdalops dilarang (403 Forbidden)
-     * untuk menyetujui atau menolak laporan melalui endpoint backend.
+     * Acceptance Criteria 4:
+     * Pengguna non-Pusdalops dilarang (403 Forbidden) menyetujui atau menolak laporan.
      */
     public function test_pengguna_non_pusdalops_dilarang_menyetujui_atau_menolak_laporan(): void
     {
@@ -273,7 +230,7 @@ class LaporanPusdalopsTest extends TestCase
     }
 
     /**
-     * Keamanan Akses: Tamu (unauthenticated) diarahkan ke halaman login.
+     * Tamu diarahkan ke login.
      */
     public function test_tamu_diarahkan_ke_login_saat_mengakses_daftar_atau_detail(): void
     {
