@@ -6,10 +6,14 @@ use App\Http\Controllers\LaporanKarhutlaController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::get('/', function () {
+Route::get('/n', function () {
     return view('welcome');
 });
 
+use App\Http\Controllers\BerandaController;
+
+Route::get('/', [BerandaController::class, 'index'])
+    ->name('beranda');
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
