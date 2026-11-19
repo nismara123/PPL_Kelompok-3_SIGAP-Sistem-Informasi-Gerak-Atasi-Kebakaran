@@ -5,6 +5,7 @@ use App\Http\Controllers\WilayahKarhutlaController;
 use App\Http\Controllers\LaporanKarhutlaController;
 use Illuminate\Support\Facades\Route;
 
+
 Route::get('/', function () {
     return view('welcome');
 });
