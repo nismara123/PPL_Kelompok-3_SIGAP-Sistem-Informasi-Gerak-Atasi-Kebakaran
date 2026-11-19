@@ -2,6 +2,11 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WilayahKarhutlaController;
+<<<<<<< Updated upstream
+=======
+use App\Http\Controllers\LaporanKarhutlaController;
+
+>>>>>>> Stashed changes
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
