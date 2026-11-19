@@ -85,4 +85,138 @@ class LaporanKarhutlaController extends Controller
 
         return view('laporan.hasil-status', compact('laporan'));
     }
+
+    // PBI-010: Menampilkan daftar seluruh laporan yang masuk (Acceptance Criteria 1)
+    public function index(Request $request)
+    {
+        $query = LaporanKarhutla::query();
+
+        // Fitur pencarian kode laporan, lokasi, atau deskripsi
+        if ($request->filled('q')) {
+            $keyword = $request->q;
+            $query->where(function ($q) use ($keyword) {
+                $q->where('kode_laporan', 'like', "%{$keyword}%")
+                  ->orWhere('lokasi', 'like', "%{$keyword}%")
+                  ->orWhere('deskripsi', 'like', "%{$keyword}%");
+            });
+        }
+
+        // Fitur filter status
+        if ($request->filled('status') && $request->status !== 'semua') {
+            $query->where('status', $request->status);
+        }
+
+        $laporans = $query->latest()->paginate(10)->withQueryString();
+
+        $ringkasan = [
+            'total' => LaporanKarhutla::count(),
+            'menunggu' => LaporanKarhutla::where('status', 'Menunggu')->count(),
+            'disetujui' => LaporanKarhutla::where('status', 'Disetujui')->count(),
+            'ditolak' => LaporanKarhutla::where('status', 'Ditolak')->count(),
+        ];
+
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Daftar laporan karhutla berhasil diambil.',
+                'ringkasan' => $ringkasan,
+                'data' => $laporans,
+            ]);
+        }
+
+        return view('laporan.index', compact('laporans', 'ringkasan'));
+    }
+
+    // PBI-010: Menampilkan rincian detail satu laporan (Acceptance Criteria 2)
+    public function show(Request $request, $id)
+    {
+        $laporan = LaporanKarhutla::findOrFail($id);
+
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Detail laporan berhasil diambil.',
+                'data' => $laporan,
+            ]);
+        }
+
+        // Pengecekan peran: Hanya Petugas BPBD Pusdalops yang dapat melihat dan menggunakan tombol verifikasi (AC 4)
+        $bisaVerifikasi = auth()->check() && auth()->user()->role === 'pusdalops';
+
+        return view('laporan.show', compact('laporan', 'bisaVerifikasi'));
+    }
+
+    // PBI-010: Menyetujui laporan (Acceptance Criteria 3 & 4 - Khusus Petugas BPBD Pusdalops)
+    public function setujui(Request $request, $id)
+    {
+        if (!auth()->check() || auth()->user()->role !== 'pusdalops') {
+            if ($request->wantsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Akses ditolak. Tombol ini hanya dapat digunakan oleh Petugas BPBD Pusdalops.',
+                ], 403);
+            }
+
+            abort(403, 'Akses ditolak. Tombol ini hanya dapat digunakan oleh Petugas BPBD Pusdalops.');
+        }
+
+        $laporan = LaporanKarhutla::findOrFail($id);
+        $laporan->update([
+            'status' => 'Disetujui',
+        ]);
+
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Laporan berhasil disetujui.',
+                'data' => $laporan,
+            ]);
+        }
+
+        return redirect()->route('laporan.show', $laporan->id)
+            ->with('success', 'Laporan berhasil disetujui.');
+    }
+
+    // PBI-010: Menolak laporan (Acceptance Criteria 3 & 4 - Khusus Petugas BPBD Pusdalops)
+    public function tolak(Request $request, $id)
+    {
+        if (!auth()->check() || auth()->user()->role !== 'pusdalops') {
+            if ($request->wantsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Akses ditolak. Tombol ini hanya dapat digunakan oleh Petugas BPBD Pusdalops.',
+                ], 403);
+            }
+
+            abort(403, 'Akses ditolak. Tombol ini hanya dapat digunakan oleh Petugas BPBD Pusdalops.');
+        }
+
+        $laporan = LaporanKarhutla::findOrFail($id);
+        $laporan->update([
+            'status' => 'Ditolak',
+        ]);
+
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Laporan berhasil ditolak.',
+                'data' => $laporan,
+            ]);
+        }
+
+        return redirect()->route('laporan.show', $laporan->id)
+            ->with('success', 'Laporan berhasil ditolak.');
+    }
+
+    // API: Mengambil daftar laporan format JSON
+    public function apiIndex(Request $request)
+    {
+        return $this->index($request);
+    }
+
+    // API: Mengambil detail laporan format JSON
+    public function apiShow(Request $request, $id)
+    {
+        return $this->show($request, $id);
+    }
 }
