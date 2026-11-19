@@ -6,7 +6,7 @@
         'pusdalops' => [
             ['label' => 'Dashboard', 'icon' => 'bi-speedometer2', 'route' => 'pusdalops.dashboard'],            
             ['label' => 'Data Wilayah Karhutla', 'icon' => 'bi-geo-alt', 'route' => 'wilayah.index'],
-            ['label' => 'Laporan Karhutla', 'icon' => 'bi-file-earmark-text'],
+            ['label' => 'Laporan Karhutla', 'icon' => 'bi-file-earmark-text', 'route' => 'laporan.index'],
             ['label' => 'Verifikasi Laporan', 'icon' => 'bi-check-circle'],
             ['label' => 'Penilaian Risiko', 'icon' => 'bi-exclamation-triangle'],
             ['label' => 'Koordinasi Damkar', 'icon' => 'bi-people'],
