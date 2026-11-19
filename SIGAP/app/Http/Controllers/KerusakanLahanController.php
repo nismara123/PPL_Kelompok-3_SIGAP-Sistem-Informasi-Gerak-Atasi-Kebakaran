@@ -36,9 +36,11 @@ class KerusakanLahanController extends Controller
             'kecamatan' => KerusakanLahan::join('wilayah_karhutla', 'wilayah_karhutla.id', '=', 'kerusakan_lahan.wilayah_id')
                 ->distinct()
                 ->count('wilayah_karhutla.kecamatan'),
+            'wilayah' => KerusakanLahan::distinct('wilayah_id')->count('wilayah_id'),
         ];
 
         return view('kerusakan_lahan.index', [
+            'stat' => $ringkasan,
             'ringkasan' => $ringkasan,
             'data' => $data,
             'kecamatanList' => WilayahKarhutla::orderBy('kecamatan')->distinct()->pluck('kecamatan'),
