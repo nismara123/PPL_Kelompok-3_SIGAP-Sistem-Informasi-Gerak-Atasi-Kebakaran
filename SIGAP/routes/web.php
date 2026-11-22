@@ -59,12 +59,12 @@ Route::get('/cek-status', [LaporanKarhutlaController::class, 'cekStatus'])
 Route::post('/cek-status', [LaporanKarhutlaController::class, 'hasilStatus'])
     ->name('laporan.hasilStatus');
 
-// PBI-010: Melihat Daftar & Detail Laporan serta Menyetujui atau Menolak Laporan
 Route::middleware(['auth'])->group(function () {
     Route::get('/laporan', [LaporanKarhutlaController::class, 'index'])->name('laporan.index');
     Route::get('/laporan/{id}', [LaporanKarhutlaController::class, 'show'])->whereNumber('id')->name('laporan.show');
     Route::post('/laporan/{id}/setujui', [LaporanKarhutlaController::class, 'setujui'])->whereNumber('id')->name('laporan.setujui');
     Route::post('/laporan/{id}/tolak', [LaporanKarhutlaController::class, 'tolak'])->whereNumber('id')->name('laporan.tolak');
+    Route::put('/laporan/{id}/perbarui-alasan', [LaporanKarhutlaController::class, 'perbaruiAlasan'])->whereNumber('id')->name('laporan.perbaruiAlasan');
 
     // Endpoint API untuk mengambil daftar dan detail laporan serta persetujuan
     Route::prefix('api')->group(function () {

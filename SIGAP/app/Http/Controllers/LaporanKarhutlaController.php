@@ -146,68 +146,117 @@ class LaporanKarhutlaController extends Controller
         return view('laporan.show', compact('laporan', 'bisaVerifikasi'));
     }
 
-    // PBI-010: Menyetujui laporan (Acceptance Criteria 3 & 4 - Khusus Petugas BPBD Pusdalops)
+    // PBI-010 & PBI-011: Menyetujui / Memverifikasi laporan
     public function setujui(Request $request, $id)
     {
         if (!auth()->check() || auth()->user()->role !== 'pusdalops') {
-            if ($request->wantsJson() || $request->is('api/*')) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Akses ditolak. Tombol ini hanya dapat digunakan oleh Petugas BPBD Pusdalops.',
-                ], 403);
-            }
-
             abort(403, 'Akses ditolak. Tombol ini hanya dapat digunakan oleh Petugas BPBD Pusdalops.');
         }
 
         $laporan = LaporanKarhutla::findOrFail($id);
+        $namaPetugas = auth()->user()->name;
+
+        // Catat ke riwayat perubahan status (PBI-012)
+        $riwayat = $laporan->riwayat_status ?? [];
+        $riwayat[] = [
+            'status_sebelumnya' => $laporan->status,
+            'status_baru' => 'Terverifikasi',
+            'diubah_oleh' => $namaPetugas,
+            'alasan_penolakan' => null,
+            'waktu' => now()->format('d-m-Y H:i') . ' WIB',
+            'timestamp' => now()->toIso8601String(),
+        ];
+
         $laporan->update([
-            'status' => 'Disetujui',
+            'status' => 'Terverifikasi',
+            'riwayat_status' => $riwayat,
+            'diubah_oleh' => $namaPetugas,
+            'diubah_pada' => now(),
         ]);
 
-        if ($request->wantsJson() || $request->is('api/*')) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Laporan berhasil disetujui.',
-                'data' => $laporan,
-            ]);
-        }
-
         return redirect()->route('laporan.show', $laporan->id)
-            ->with('success', 'Laporan berhasil disetujui.');
+            ->with('success', 'Laporan berhasil diverifikasi / disetujui.');
     }
 
-    // PBI-010: Menolak laporan (Acceptance Criteria 3 & 4 - Khusus Petugas BPBD Pusdalops)
+    // PBI-011 & PBI-012: Menolak laporan DENGAN Alasan Penolakan Wajib
     public function tolak(Request $request, $id)
     {
         if (!auth()->check() || auth()->user()->role !== 'pusdalops') {
-            if ($request->wantsJson() || $request->is('api/*')) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Akses ditolak. Tombol ini hanya dapat digunakan oleh Petugas BPBD Pusdalops.',
-                ], 403);
-            }
-
             abort(403, 'Akses ditolak. Tombol ini hanya dapat digunakan oleh Petugas BPBD Pusdalops.');
         }
 
-        $laporan = LaporanKarhutla::findOrFail($id);
-        $laporan->update([
-            'status' => 'Ditolak',
+        // VALIDASI: Alasan penolakan wajib diisi (tidak boleh kosong)
+        $request->validate([
+            'alasan_penolakan' => 'required|string|min:5|max:1000',
+        ], [
+            'alasan_penolakan.required' => 'Alasan penolakan wajib diisi sebelum menyimpan keputusan penolakan.',
+            'alasan_penolakan.min' => 'Alasan penolakan minimal 5 karakter.',
         ]);
 
-        if ($request->wantsJson() || $request->is('api/*')) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Laporan berhasil ditolak.',
-                'data' => $laporan,
-            ]);
-        }
+        $laporan = LaporanKarhutla::findOrFail($id);
+        $namaPetugas = auth()->user()->name;
+        $alasan = trim($request->alasan_penolakan);
+
+        // Catat ke riwayat perubahan status (PBI-012)
+        $riwayat = $laporan->riwayat_status ?? [];
+        $riwayat[] = [
+            'status_sebelumnya' => $laporan->status,
+            'status_baru' => 'Ditolak',
+            'diubah_oleh' => $namaPetugas,
+            'alasan_penolakan' => $alasan,
+            'waktu' => now()->format('d-m-Y H:i') . ' WIB',
+            'timestamp' => now()->toIso8601String(),
+        ];
+
+        $laporan->update([
+            'status' => 'Ditolak',
+            'alasan_penolakan' => $alasan,
+            'riwayat_status' => $riwayat,
+            'diubah_oleh' => $namaPetugas,
+            'diubah_pada' => now(),
+        ]);
 
         return redirect()->route('laporan.show', $laporan->id)
-            ->with('success', 'Laporan berhasil ditolak.');
+            ->with('success', 'Laporan berhasil ditolak dan alasan penolakan telah disimpan.');
     }
 
+    // PBI-012: Edit/Perbarui Alasan Penolakan
+    public function perbaruiAlasan(Request $request, $id)
+    {
+        if (!auth()->check() || auth()->user()->role !== 'pusdalops') {
+            abort(403, 'Akses ditolak.');
+        }
+
+        $request->validate([
+            'alasan_penolakan' => 'required|string|min:5|max:1000',
+        ], [
+            'alasan_penolakan.required' => 'Alasan penolakan tidak boleh kosong.',
+        ]);
+
+        $laporan = LaporanKarhutla::findOrFail($id);
+        $namaPetugas = auth()->user()->name;
+        $alasanBaru = trim($request->alasan_penolakan);
+
+        $riwayat = $laporan->riwayat_status ?? [];
+        $riwayat[] = [
+            'status_sebelumnya' => 'Ditolak',
+            'status_baru' => 'Ditolak (Pembaruan Alasan)',
+            'diubah_oleh' => $namaPetugas,
+            'alasan_penolakan' => $alasanBaru,
+            'waktu' => now()->format('d-m-Y H:i') . ' WIB',
+            'timestamp' => now()->toIso8601String(),
+        ];
+
+        $laporan->update([
+            'alasan_penolakan' => $alasanBaru,
+            'riwayat_status' => $riwayat,
+            'diubah_oleh' => $namaPetugas,
+            'diubah_pada' => now(),
+        ]);
+
+        return redirect()->route('laporan.show', $laporan->id)
+            ->with('success', 'Alasan penolakan berhasil diperbarui.');
+}
     // API: Mengambil daftar laporan format JSON
     public function apiIndex(Request $request)
     {
