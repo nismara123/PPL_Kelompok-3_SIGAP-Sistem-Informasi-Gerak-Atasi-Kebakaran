@@ -15,9 +15,15 @@ class LaporanKarhutla extends Model
         'deskripsi',
         'foto',
         'status',
+        'alasan_penolakan',
+        'riwayat_status',
+        'diubah_oleh',
+        'diubah_pada',
     ];
 
     protected $casts = [
         'waktu_kejadian' => 'datetime',
+        'diubah_pada' => 'datetime',
+        'riwayat_status' => 'array',
     ];
 }
