@@ -160,7 +160,7 @@ class LaporanKarhutlaController extends Controller
         $riwayat = $laporan->riwayat_status ?? [];
         $riwayat[] = [
             'status_sebelumnya' => $laporan->status,
-            'status_baru' => 'Terverifikasi',
+            'status_baru' => 'Disetujui',
             'diubah_oleh' => $namaPetugas,
             'alasan_penolakan' => null,
             'waktu' => now()->format('d-m-Y H:i') . ' WIB',
@@ -168,7 +168,7 @@ class LaporanKarhutlaController extends Controller
         ];
 
         $laporan->update([
-            'status' => 'Terverifikasi',
+            'status' => 'Disetujui',
             'riwayat_status' => $riwayat,
             'diubah_oleh' => $namaPetugas,
             'diubah_pada' => now(),
@@ -185,17 +185,9 @@ class LaporanKarhutlaController extends Controller
             abort(403, 'Akses ditolak. Tombol ini hanya dapat digunakan oleh Petugas BPBD Pusdalops.');
         }
 
-        // VALIDASI: Alasan penolakan wajib diisi (tidak boleh kosong)
-        $request->validate([
-            'alasan_penolakan' => 'required|string|min:5|max:1000',
-        ], [
-            'alasan_penolakan.required' => 'Alasan penolakan wajib diisi sebelum menyimpan keputusan penolakan.',
-            'alasan_penolakan.min' => 'Alasan penolakan minimal 5 karakter.',
-        ]);
-
         $laporan = LaporanKarhutla::findOrFail($id);
         $namaPetugas = auth()->user()->name;
-        $alasan = trim($request->alasan_penolakan);
+        $alasan = trim($request->input('alasan_penolakan') ?? 'Laporan ditolak oleh Petugas Pusdalops.');
 
         // Catat ke riwayat perubahan status (PBI-012)
         $riwayat = $laporan->riwayat_status ?? [];

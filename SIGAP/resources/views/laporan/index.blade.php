@@ -1,231 +1,133 @@
 @extends('layouts.app')
 
-@section('title', 'Daftar Laporan Karhutla - SIGAP')
+@section('title', 'Verifikasi Laporan Masyarakat - SIGAP')
 
 @section('content')
-<div class="container-fluid px-0">
+<main id="view-verifikasi" class="p-4 sm:p-7 max-w-[1380px] w-full mx-auto space-y-6">
 
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
-        <div>
-            <h2 class="fw-bold mb-1" style="color: #64271D;">
-                <i class="bi bi-file-earmark-text me-2"></i>Daftar Laporan Karhutla
-            </h2>
-            <p class="text-muted mb-0">
-                Data seluruh laporan kejadian kebakaran hutan dan lahan yang masuk ke sistem SIGAP.
-            </p>
-        </div>
-
-        <div class="d-flex gap-2">
-            <a href="{{ route('laporan.create') }}" target="_blank" class="btn text-white fw-semibold shadow-sm" style="background-color: #f4512c;">
-                <i class="bi bi-plus-circle me-1"></i> Form Pelaporan Baru
-            </a>
-        </div>
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2 text-xs text-slate-500 mb-1">
+        <a href="{{ route('pusdalops.dashboard') }}" class="hover:text-slate-900 font-medium text-decoration-none">Dashboard</a>
+        <span>/</span>
+        <span class="text-slate-800 font-semibold">Daftar Laporan Karhutla</span>
+      </div>
+      <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+        Verifikasi Laporan Masyarakat
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-500 mt-1">
+        Validasi laporan masuk sebelum atau sesudah dilakukan penilaian risiko lapangan.
+      </p>
     </div>
 
-    @if(session('success'))
-        <div class="alert alert-success border-0 shadow-sm d-flex align-items-center gap-2 mb-4">
-            <i class="bi bi-check-circle-fill fs-5"></i>
-            <div>{{ session('success') }}</div>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="alert alert-danger border-0 shadow-sm d-flex align-items-center gap-2 mb-4">
-            <i class="bi bi-exclamation-triangle-fill fs-5"></i>
-            <div>{{ session('error') }}</div>
-        </div>
-    @endif
-
-    {{-- Ringkasan Statistik Laporan --}}
-    <div class="row g-3 mb-4">
-        <div class="col-sm-6 col-xl-3">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body d-flex align-items-center gap-3">
-                    <div class="rounded-3 p-3 text-primary bg-primary bg-opacity-10 fs-3">
-                        <i class="bi bi-folder2-open"></i>
-                    </div>
-                    <div>
-                        <div class="text-muted small text-uppercase fw-semibold">Total Laporan</div>
-                        <div class="fs-4 fw-bold text-dark">{{ number_format($ringkasan['total'] ?? 0) }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-sm-6 col-xl-3">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body d-flex align-items-center gap-3">
-                    <div class="rounded-3 p-3 text-warning bg-warning bg-opacity-10 fs-3">
-                        <i class="bi bi-hourglass-split"></i>
-                    </div>
-                    <div>
-                        <div class="text-muted small text-uppercase fw-semibold">Menunggu</div>
-                        <div class="fs-4 fw-bold text-dark">{{ number_format($ringkasan['menunggu'] ?? 0) }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-sm-6 col-xl-3">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body d-flex align-items-center gap-3">
-                    <div class="rounded-3 p-3 text-success bg-success bg-opacity-10 fs-3">
-                        <i class="bi bi-check2-circle"></i>
-                    </div>
-                    <div>
-                        <div class="text-muted small text-uppercase fw-semibold">Disetujui</div>
-                        <div class="fs-4 fw-bold text-dark">{{ number_format($ringkasan['disetujui'] ?? 0) }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-sm-6 col-xl-3">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body d-flex align-items-center gap-3">
-                    <div class="rounded-3 p-3 text-danger bg-danger bg-opacity-10 fs-3">
-                        <i class="bi bi-x-circle"></i>
-                    </div>
-                    <div>
-                        <div class="text-muted small text-uppercase fw-semibold">Ditolak</div>
-                        <div class="fs-4 fw-bold text-dark">{{ number_format($ringkasan['ditolak'] ?? 0) }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="flex items-center gap-2">
+      <span class="px-3.5 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-700 shadow-2xs">
+        Total: {{ $ringkasan['total'] ?? count($laporans) }} Laporan
+      </span>
     </div>
+  </div>
 
-    {{-- Filter & Pencarian --}}
-    <div class="card border-0 shadow-sm rounded-3 mb-4">
-        <div class="card-body p-3">
-            <form method="GET" action="{{ route('laporan.index') }}" class="row g-2 align-items-center">
-                <div class="col-md-5">
-                    <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0 text-muted">
-                            <i class="bi bi-search"></i>
-                        </span>
-                        <input type="text" name="q" value="{{ request('q') }}" class="form-control border-start-0" placeholder="Cari kode laporan, lokasi, atau deskripsi...">
-                    </div>
+  @if(session('success'))
+    <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800 flex items-center gap-2">
+      <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+      </svg>
+      <span>{{ session('success') }}</span>
+    </div>
+  @endif
+
+  <!-- Verification Table (Persis Sesuai Image 4) -->
+  <div class="bg-white rounded-2xl border border-slate-200/80 shadow-[0_1px_3px_rgba(15,23,42,0.03)] overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/70">
+            <th class="py-3.5 px-5">KODE</th>
+            <th class="py-3.5 px-4">LOKASI & PELAPOR</th>
+            <th class="py-3.5 px-4">STATUS VERIFIKASI</th>
+            <th class="py-3.5 px-5 text-right">TINDAKAN</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-xs">
+          @forelse($laporans as $item)
+            @php
+              $isVerified = in_array($item->status, ['Terverifikasi', 'Disetujui']);
+            @endphp
+            <tr class="hover:bg-slate-50/80 transition">
+              <td class="py-4 px-5 font-bold text-blue-600 align-top whitespace-nowrap">
+                <a href="{{ route('laporan.show', $item->id) }}" class="hover:underline text-blue-600 text-decoration-none">
+                  {{ $item->kode_laporan }}
+                </a>
+              </td>
+              <td class="py-4 px-4 align-top">
+                <div class="font-bold text-slate-900">{{ $item->lokasi }}</div>
+                <div class="text-[11px] text-slate-500 mt-0.5">
+                  Pelapor: {{ $item->pelapor ?? 'Warga / Relawan MPA' }} • {{ \Carbon\Carbon::parse($item->waktu_kejadian ?? $item->created_at)->format('d M Y, H:i') }} WIB
                 </div>
-
-                <div class="col-md-4">
-                    <select name="status" class="form-select">
-                        <option value="semua" {{ request('status') == 'semua' ? 'selected' : '' }}>-- Semua Status --</option>
-                        <option value="Menunggu" {{ request('status') == 'Menunggu' ? 'selected' : '' }}>Menunggu</option>
-                        <option value="Disetujui" {{ request('status') == 'Disetujui' ? 'selected' : '' }}>Disetujui</option>
-                        <option value="Ditolak" {{ request('status') == 'Ditolak' ? 'selected' : '' }}>Ditolak</option>
-                    </select>
-                </div>
-
-                <div class="col-md-3 d-flex gap-2">
-                    <button type="submit" class="btn text-white fw-semibold w-100" style="background-color: #64271D;">
-                        Filter
+              </td>
+              <td class="py-4 px-4 align-top whitespace-nowrap">
+                @if($isVerified)
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-700">
+                    Terverifikasi
+                  </span>
+                @elseif($item->status === 'Ditolak')
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-rose-100 text-rose-700">
+                    Ditolak
+                  </span>
+                @else
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-800">
+                    Menunggu
+                  </span>
+                @endif
+              </td>
+              <td class="py-4 px-5 align-top text-right whitespace-nowrap">
+                @if(!$isVerified)
+                  <form action="{{ route('laporan.setujui', $item->id) }}" method="POST" class="inline m-0">
+                    @csrf
+                    <button
+                      type="submit"
+                      class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition shadow-2xs"
+                    >
+                      Verifikasi Laporan
                     </button>
-                    @if(request('q') || (request('status') && request('status') !== 'semua'))
-                        <a href="{{ route('laporan.index') }}" class="btn btn-outline-secondary" title="Reset Filter">
-                            <i class="bi bi-arrow-counterclockwise"></i>
-                        </a>
-                    @endif
-                </div>
-            </form>
-        </div>
+                  </form>
+                @else
+                  @if($item->tingkat_risiko)
+                    <a
+                      href="{{ route('penilaian-risiko.edit', $item->id) }}"
+                      class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition text-decoration-none"
+                    >
+                      Buka Form Penilaian
+                    </a>
+                  @else
+                    <a
+                      href="{{ route('penilaian-risiko.create', $item->id) }}"
+                      class="px-3 py-1.5 rounded-lg border border-[#e03c22] bg-[#fff5f3] hover:bg-[#ffedea] text-[#c8321b] text-xs font-semibold transition text-decoration-none"
+                    >
+                      Buka Form Penilaian
+                    </a>
+                  @endif
+                @endif
+              </td>
+            </tr>
+          @empty
+            <tr>
+              <td colspan="4" class="py-10 text-center text-slate-400">
+                Tidak ada laporan masuk yang memerlukan tindakan.
+              </td>
+            </tr>
+          @endforelse
+        </tbody>
+      </table>
     </div>
 
-    {{-- Tabel Laporan --}}
-    <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
-        <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 fw-semibold text-dark">Data Laporan Masuk</h5>
-            <span class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill">
-                Menampilkan {{ $laporans->count() }} dari {{ $laporans->total() }} laporan
-            </span>
-        </div>
+    @if($laporans->hasPages())
+      <div class="p-4 border-t border-slate-100">
+        {{ $laporans->links() }}
+      </div>
+    @endif
+  </div>
 
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th class="text-center" style="width: 60px;">No</th>
-                        <th>Kode Laporan</th>
-                        <th>Lokasi Kejadian</th>
-                        <th>Waktu Kejadian</th>
-                        <th>Foto</th>
-                        <th class="text-center">Status</th>
-                        <th class="text-center" style="width: 140px;">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($laporans as $index => $item)
-                        <tr>
-                            <td class="text-center text-muted">
-                                {{ $laporans->firstItem() + $index }}
-                            </td>
-                            <td>
-                                <span class="fw-bold font-monospace text-primary">
-                                    {{ $item->kode_laporan }}
-                                </span>
-                            </td>
-                            <td>
-                                <div class="fw-semibold text-dark">{{ $item->lokasi }}</div>
-                                <small class="text-muted d-block text-truncate" style="max-width: 250px;">
-                                    {{ $item->deskripsi }}
-                                </small>
-                            </td>
-                            <td>
-                                <div><i class="bi bi-calendar-event me-1 text-muted"></i>{{ \Carbon\Carbon::parse($item->waktu_kejadian)->format('d M Y') }}</div>
-                                <small class="text-muted"><i class="bi bi-clock me-1"></i>{{ \Carbon\Carbon::parse($item->waktu_kejadian)->format('H:i') }} WIB</small>
-                            </td>
-                            <td>
-                                @if($item->foto)
-                                    <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle">
-                                        <i class="bi bi-image me-1"></i> Ada Foto
-                                    </span>
-                                @else
-                                    <span class="text-muted small">
-                                        <i class="bi bi-dash"></i>
-                                    </span>
-                                @endif
-                            </td>
-                            <td class="text-center">
-                                @if($item->status === 'Disetujui')
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill">
-                                        <i class="bi bi-check-circle-fill me-1"></i> Disetujui
-                                    </span>
-                                @elseif($item->status === 'Ditolak')
-                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 rounded-pill">
-                                        <i class="bi bi-x-circle-fill me-1"></i> Ditolak
-                                    </span>
-                                @else
-                                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-2 rounded-pill">
-                                        <i class="bi bi-hourglass-split me-1"></i> Menunggu
-                                    </span>
-                                @endif
-                            </td>
-                            <td class="text-center">
-                                <a href="{{ route('laporan.show', $item->id) }}" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1 shadow-sm">
-                                    <i class="bi bi-eye"></i>
-                                    <span>Lihat Detail</span>
-                                </a>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="text-center py-5 text-muted">
-                                <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary opacity-50"></i>
-                                <div class="fw-semibold">Belum ada laporan karhutla yang masuk.</div>
-                                <small>Laporan dari masyarakat akan muncul di tabel ini.</small>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        @if($laporans->hasPages())
-            <div class="card-footer bg-white py-3 border-top d-flex justify-content-end">
-                {{ $laporans->links() }}
-            </div>
-        @endif
-    </div>
-
-</div>
+</main>
 @endsection

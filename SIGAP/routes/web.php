@@ -3,6 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WilayahKarhutlaController;
 use App\Http\Controllers\LaporanKarhutlaController;
+use App\Models\LaporanKarhutla;
+use App\Models\WilayahKarhutla;
 use Illuminate\Support\Facades\Route;
 
 
@@ -34,8 +36,27 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('/pusdalops/dashboard', function () {
-    return view('petugas.pusdalops.dashboard');
-})->name('pusdalops.dashboard');
+    $totalLaporan = LaporanKarhutla::count();
+    $menunggu = LaporanKarhutla::where('status', 'Menunggu')->count();
+    $terverifikasi = LaporanKarhutla::whereIn('status', ['Terverifikasi', 'Disetujui'])->count();
+    $perluPenilaian = LaporanKarhutla::whereIn('status', ['Terverifikasi', 'Disetujui'])->whereNull('tingkat_risiko')->count();
+    $risikoTinggiKritis = LaporanKarhutla::whereIn('tingkat_risiko', ['Kritis', 'Tinggi'])->count();
+    $totalWilayah = \App\Models\WilayahKarhutla::count();
+
+    $laporanTerbaru = LaporanKarhutla::latest()->take(6)->get();
+    $semuaLaporan = LaporanKarhutla::latest()->get();
+
+    $ringkasan = [
+        'total' => $totalLaporan,
+        'menunggu' => $menunggu,
+        'terverifikasi' => $terverifikasi,
+        'perlu_penilaian' => $perluPenilaian,
+        'risiko_tinggi_kritis' => $risikoTinggiKritis,
+        'total_wilayah' => $totalWilayah,
+    ];
+
+    return view('petugas.pusdalops.dashboard', compact('ringkasan', 'laporanTerbaru', 'semuaLaporan'));
+})->middleware('auth')->name('pusdalops.dashboard');
 
 Route::get('/damkar/dashboard', function () {
     return view('petugas.damkar.dashboard');
@@ -46,6 +67,7 @@ Route::get('/rr/dashboard', function () {
 })->middleware('auth')->name('rr.dashboard');
 
 require __DIR__.'/fsi02.php';
+require __DIR__.'/fsi05.php';
 
 Route::get('/laporan/create', [LaporanKarhutlaController::class, 'create'])
     ->name('laporan.create');

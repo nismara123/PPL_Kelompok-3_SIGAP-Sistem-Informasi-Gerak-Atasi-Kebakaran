@@ -216,6 +216,152 @@
         </div>
     </div>
 
+    {{-- Bagian Hasil Penilaian Risiko Kejadian --}}
+    <div class="card border-0 shadow-sm rounded-3 mt-4">
+        <div class="card-header bg-white py-3 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <h5 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+                <i class="bi bi-shield-check text-primary"></i>
+                Hasil Penilaian Risiko & Prioritas Kejadian
+            </h5>
+
+            <div class="d-flex align-items-center gap-2">
+                @if($laporan->tingkat_risiko)
+                    @php
+                        $badgeRisiko = match($laporan->tingkat_risiko) {
+                            'Kritis' => 'bg-danger text-white',
+                            'Tinggi' => 'bg-warning text-dark',
+                            'Sedang' => 'bg-info text-dark',
+                            'Rendah' => 'bg-success text-white',
+                            default => 'bg-secondary text-white'
+                        };
+                        $badgePrioritas = match($laporan->prioritas_penanganan) {
+                            'Darurat' => 'bg-danger text-white',
+                            'Tinggi' => 'bg-warning text-dark',
+                            'Sedang' => 'bg-info text-dark',
+                            'Rendah' => 'bg-success text-white',
+                            default => 'bg-secondary text-white'
+                        };
+                    @endphp
+                    <span class="badge {{ $badgeRisiko }} px-3 py-2 rounded-pill fw-bold">
+                        Risiko: {{ $laporan->tingkat_risiko }}
+                    </span>
+                    <span class="badge {{ $badgePrioritas }} px-3 py-2 rounded-pill fw-bold">
+                        Prioritas: {{ $laporan->prioritas_penanganan ?? '-' }}
+                    </span>
+                    @if(auth()->check() && auth()->user()->role === 'pusdalops')
+                        <a href="{{ route('penilaian-risiko.edit', $laporan->id) }}" class="btn btn-sm btn-outline-primary ms-2">
+                            <i class="bi bi-pencil-square me-1"></i> Edit Penilaian
+                        </a>
+                    @endif
+                @endif
+            </div>
+        </div>
+
+        <div class="card-body p-4">
+            @if($laporan->tingkat_risiko)
+                <div class="row g-4">
+                    <div class="col-lg-6">
+                        <table class="table table-bordered mb-0">
+                            <tbody>
+                                <tr>
+                                    <th class="table-light text-muted" style="width: 40%;">Tingkat Risiko</th>
+                                    <td>
+                                        <span class="badge {{ $badgeRisiko }} px-3 py-2 rounded-pill fw-bold fs-6">
+                                            {{ $laporan->tingkat_risiko }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="table-light text-muted">Prioritas Penanganan</th>
+                                    <td>
+                                        <span class="badge {{ $badgePrioritas }} px-3 py-2 rounded-pill fw-bold fs-6">
+                                            {{ $laporan->prioritas_penanganan ?? '-' }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="table-light text-muted">Estimasi Luas Terdampak</th>
+                                    <td class="fw-semibold text-dark">
+                                        {{ $laporan->estimasi_luas_terdampak ?: 'Tidak dicantumkan' }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="table-light text-muted">Faktor Potensi Bahaya</th>
+                                    <td>
+                                        @if($laporan->potensi_bahaya)
+                                            @foreach(explode(', ', $laporan->potensi_bahaya) as $itemBahaya)
+                                                <span class="badge bg-light text-dark border me-1 mb-1">{{ $itemBahaya }}</span>
+                                            @endforeach
+                                        @else
+                                            <span class="text-muted small fst-italic">Tidak ada faktor bahaya khusus</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="col-lg-6 d-flex flex-column justify-content-between">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <h6 class="fw-bold text-dark mb-2 d-flex align-items-center gap-1">
+                                <i class="bi bi-chat-left-text text-primary"></i> Catatan Hasil Analisis Penilaian Risiko:
+                            </h6>
+                            <p class="text-secondary mb-0" style="white-space: pre-line; line-height: 1.6;">
+                                {{ $laporan->catatan_penilaian }}
+                            </p>
+                        </div>
+
+                        <div class="mt-3 small text-muted d-flex justify-content-between align-items-center pt-2 border-top">
+                            <div>
+                                <i class="bi bi-person-check me-1"></i>Dinilai oleh: <strong>{{ $laporan->dinilai_oleh ?? 'Petugas Pusdalops' }}</strong>
+                            </div>
+                            <div>
+                                <i class="bi bi-clock me-1"></i>{{ $laporan->dinilai_pada ? \Carbon\Carbon::parse($laporan->dinilai_pada)->format('d-m-Y H:i') . ' WIB' : '-' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Riwayat Perubahan Penilaian Risiko --}}
+                @if(!empty($laporan->riwayat_penilaian) && count($laporan->riwayat_penilaian) > 1)
+                    <div class="mt-4 pt-3 border-top">
+                        <h6 class="fw-bold text-dark mb-2 small text-uppercase">
+                            <i class="bi bi-clock-history me-1 text-primary"></i> Riwayat Pembaruan Penilaian Risiko
+                        </h6>
+                        <div class="list-group list-group-flush small">
+                            @foreach(array_reverse($laporan->riwayat_penilaian) as $riwayatItem)
+                                <div class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="fw-semibold text-dark">{{ $riwayatItem['aksi'] ?? 'Pembaruan' }}</span>:
+                                        Risiko <span class="badge bg-secondary">{{ $riwayatItem['tingkat_risiko'] ?? ($riwayatItem['tingkat_risiko_baru'] ?? '-') }}</span>
+                                        - Prioritas <span class="badge bg-secondary">{{ $riwayatItem['prioritas_penanganan'] ?? ($riwayatItem['prioritas_baru'] ?? '-') }}</span>
+                                        @if(!empty($riwayatItem['catatan_penilaian']))
+                                            <div class="text-muted mt-1 fst-italic">"{{ Str::limit($riwayatItem['catatan_penilaian'], 80) }}"</div>
+                                        @endif
+                                    </div>
+                                    <div class="text-end text-muted">
+                                        <div>{{ $riwayatItem['dinilai_oleh'] ?? ($riwayatItem['diubah_oleh'] ?? '-') }}</div>
+                                        <small>{{ $riwayatItem['waktu'] ?? '-' }}</small>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+            @else
+                {{-- Belum dinilai --}}
+                <div class="text-center py-4 text-muted">
+                    <p class="mb-2">Laporan ini belum memiliki hasil penilaian risiko.</p>
+                    @if(auth()->check() && auth()->user()->role === 'pusdalops')
+                        <a href="{{ route('penilaian-risiko.create', $laporan->id) }}" class="btn btn-sm btn-danger fw-semibold">
+                            <i class="bi bi-pencil-square me-1"></i> Isi Penilaian Risiko
+                        </a>
+                    @endif
+                </div>
+            @endif
+        </div>
+    </div>
+
     {{-- Bagian Aksi Verifikasi: Khusus Petugas BPBD Pusdalops --}}
     @if($bisaVerifikasi)
         <div class="card border-0 shadow-sm rounded-3 mt-4 border-start border-4 border-warning">
@@ -254,6 +400,7 @@
 
 </div>
 
+@if(auth()->check() && auth()->user()->role === 'pusdalops')
 <!-- Modal Tolak Laporan (Wajib Isi Alasan Penolakan - PBI-011 & PBI-012) -->
 <div class="modal fade" id="modalTolak" tabindex="-1" aria-labelledby="modalTolakLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -288,6 +435,7 @@
         </div>
     </div>
 </div>
+@endif
 
 <!-- Modal Edit Alasan Penolakan (PBI-012 AC 3) -->
 @if($laporan->status === 'Ditolak')
