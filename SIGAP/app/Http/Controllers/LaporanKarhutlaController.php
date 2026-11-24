@@ -127,6 +127,43 @@ class LaporanKarhutlaController extends Controller
         return view('laporan.index', compact('laporans', 'ringkasan'));
     }
 
+    // PBI-010 & PBI-011: Halaman Khusus Antrean Verifikasi Laporan Petugas Pusdalops
+    public function verifikasiIndex(Request $request)
+    {
+        $query = LaporanKarhutla::query();
+
+        // Fitur pencarian kode laporan, lokasi, atau deskripsi
+        if ($request->filled('q')) {
+            $keyword = $request->q;
+            $query->where(function ($q) use ($keyword) {
+                $q->where('kode_laporan', 'like', "%{$keyword}%")
+                  ->orWhere('lokasi', 'like', "%{$keyword}%")
+                  ->orWhere('deskripsi', 'like', "%{$keyword}%");
+            });
+        }
+
+        // Filter status khusus verifikasi (default: prioritaskan 'Menunggu')
+        $statusFilter = $request->get('status', 'Menunggu');
+        if ($statusFilter !== 'semua') {
+            if ($statusFilter === 'Disetujui') {
+                $query->whereIn('status', ['Disetujui', 'Terverifikasi']);
+            } else {
+                $query->where('status', $statusFilter);
+            }
+        }
+
+        $laporans = $query->latest()->paginate(10)->withQueryString();
+
+        $ringkasan = [
+            'total' => LaporanKarhutla::count(),
+            'menunggu' => LaporanKarhutla::where('status', 'Menunggu')->count(),
+            'disetujui' => LaporanKarhutla::whereIn('status', ['Disetujui', 'Terverifikasi'])->count(),
+            'ditolak' => LaporanKarhutla::where('status', 'Ditolak')->count(),
+        ];
+
+        return view('verifikasi.index', compact('laporans', 'ringkasan'));
+    }
+
     // PBI-010: Menampilkan rincian detail satu laporan (Acceptance Criteria 2)
     public function show(Request $request, $id)
     {

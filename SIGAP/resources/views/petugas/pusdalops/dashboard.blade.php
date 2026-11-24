@@ -80,7 +80,7 @@
       <div class="min-w-0">
         <div class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">BUTUH NILAI RISIKO</div>
         <div class="text-2xl font-extrabold text-slate-900 mt-0.5 tabular-nums">{{ number_format($ringkasan['perlu_penilaian'] ?? 0) }}</div>
-        <div class="text-xs font-semibold text-[#e03c22] mt-0.5">{{ ($ringkasan['perlu_penilaian'] ?? 0) > 0 ? 'Isi form penilaian' : 'Semua sudah dinilai' }} &rarr;</div>
+        <div class="text-xs font-semibold text-[#e03c22] mt-0.5">Tentukan prioritas &rarr;</div>
       </div>
     </a>
 
@@ -112,7 +112,7 @@
           </svg>
           <div>
             <h2 class="text-sm sm:text-base font-bold text-slate-900 leading-snug">Kejadian Karhutla Terbaru</h2>
-            <p class="text-xs text-slate-500 mt-0.5">Daftar laporan kejadian beserta tingkat risiko dan urutan prioritas penanganan</p>
+            <p class="text-xs text-slate-500 mt-0.5">Daftar laporan kejadian dan hasil penilaian risiko serta prioritas penanganan</p>
           </div>
         </div>
 
@@ -129,28 +129,28 @@
         <table class="w-full text-left border-collapse">
           <thead>
             <tr class="border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/50">
-              <th class="py-3 px-4">Kode Laporan</th>
-              <th class="py-3 px-4">Lokasi Kejadian</th>
-              <th class="py-3 px-4">Status</th>
-              <th class="py-3 px-4">Tingkat Risiko</th>
-              <th class="py-3 px-4">Prioritas</th>
-              <th class="py-3 px-4 text-right">Aksi</th>
+              <th class="py-3 px-4">KODE LAPORAN</th>
+              <th class="py-3 px-4">LOKASI KEJADIAN</th>
+              <th class="py-3 px-4">STATUS</th>
+              <th class="py-3 px-4">TINGKAT RISIKO</th>
+              <th class="py-3 px-4">PRIORITAS</th>
+              <th class="py-3 px-4 text-center">AKSI</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 text-xs">
             @forelse($laporanTerbaru as $item)
               <tr class="hover:bg-slate-50/80 transition">
-                <td class="py-3.5 px-4 align-top whitespace-nowrap">
+                <td class="py-3.5 px-4 align-middle whitespace-nowrap">
                   <div class="font-bold text-blue-600">{{ $item->kode_laporan }}</div>
                   <div class="text-[11px] text-slate-400 mt-0.5">
                     {{ \Carbon\Carbon::parse($item->waktu_kejadian ?? $item->created_at)->diffForHumans() }}
                   </div>
                 </td>
-                <td class="py-3.5 px-4 align-top">
+                <td class="py-3.5 px-4 align-middle">
                   <div class="font-semibold text-slate-900 line-clamp-1">{{ $item->lokasi }}</div>
                   <div class="text-[11px] text-slate-500 mt-0.5 line-clamp-1">{{ $item->deskripsi }}</div>
                 </td>
-                <td class="py-3.5 px-4 align-top whitespace-nowrap">
+                <td class="py-3.5 px-4 align-middle whitespace-nowrap">
                   @if($item->status === 'Terverifikasi' || $item->status === 'Disetujui')
                     <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-700">
                       Terverifikasi
@@ -165,7 +165,7 @@
                     </span>
                   @endif
                 </td>
-                <td class="py-3.5 px-4 align-top whitespace-nowrap">
+                <td class="py-3.5 px-4 align-middle whitespace-nowrap">
                   @if($item->tingkat_risiko)
                     @php
                       $riskStyle = match($item->tingkat_risiko) {
@@ -185,7 +185,7 @@
                     </span>
                   @endif
                 </td>
-                <td class="py-3.5 px-4 align-top whitespace-nowrap">
+                <td class="py-3.5 px-4 align-middle whitespace-nowrap">
                   @if($item->prioritas_penanganan)
                     @php
                       $prioVal = (string)$item->prioritas_penanganan;
@@ -197,10 +197,11 @@
                         default => 'Prioritas ' . $prioVal
                       };
                       $prioCls = match($prioLabel) {
-                        'Prioritas 1' => 'bg-red-600 text-white',
-                        'Prioritas 2' => 'bg-amber-500 text-white',
-                        'Prioritas 3' => 'bg-blue-600 text-white',
-                        default => 'bg-slate-600 text-white'
+                        'Prioritas 1' => 'bg-[#dc2626] text-white',
+                        'Prioritas 2' => 'bg-[#f59e0b] text-white',
+                        'Prioritas 3' => 'bg-[#2563eb] text-white',
+                        'Prioritas 4' => 'bg-[#334155] text-white',
+                        default => 'bg-slate-700 text-white'
                       };
                     @endphp
                     <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold {{ $prioCls }}">
@@ -210,28 +211,28 @@
                     <span class="text-[11px] font-medium text-slate-400">Menunggu</span>
                   @endif
                 </td>
-                <td class="py-3.5 px-4 align-top text-right whitespace-nowrap">
-                  <div class="inline-flex items-center gap-1.5">
+                <td class="py-3.5 px-4 align-middle text-center whitespace-nowrap">
+                  <div class="inline-flex items-center justify-center gap-1.5">
                     <button
                       type="button"
                       onclick="showIncidentDetail({{ json_encode($item) }})"
                       class="px-3 py-1.5 rounded-lg border border-blue-200 bg-white hover:bg-blue-50 text-[11px] font-semibold text-blue-600 transition"
                     >
-                      Detail
+                      Buka
                     </button>
                     @if($item->tingkat_risiko)
                       <a
                         href="{{ route('penilaian-risiko.edit', $item->id) }}"
-                        class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white text-[11px] font-semibold transition"
+                        class="px-3.5 py-1.5 rounded-lg bg-[#1e293b] hover:bg-[#0f172a] text-white text-[11px] font-semibold transition"
                       >
-                        Perbarui
+                        Ubah
                       </a>
                     @else
                       <a
                         href="{{ route('penilaian-risiko.create', $item->id) }}"
-                        class="px-3 py-1.5 rounded-lg bg-[#e03c22] hover:bg-[#c53019] text-white text-[11px] font-semibold transition"
+                        class="px-3.5 py-1.5 rounded-lg bg-[#dc2626] hover:bg-[#b91c1c] text-white text-[11px] font-semibold transition"
                       >
-                        Nilai Risiko
+                        Nilai
                       </a>
                     @endif
                   </div>
@@ -259,7 +260,7 @@
       </div>
 
       <div class="space-y-2.5">
-        <!-- Quick Action 1: Buka Form Input Baru (PBI-013) -->
+        <!-- Quick Action 1: Catat Penilaian Risiko -->
         @php
           $firstUnassessed = $laporanTerbaru->firstWhere('tingkat_risiko', null);
           $formCreateUrl = $firstUnassessed ? route('penilaian-risiko.create', $firstUnassessed->id) : route('penilaian-risiko.index', ['tab' => 'perlu_dinilai']);
@@ -275,8 +276,8 @@
               </svg>
             </div>
             <div class="min-w-0">
-              <div class="text-xs font-bold text-slate-900 group-hover:text-[#e03c22] transition">Form Penilaian Risiko Baru</div>
-              <div class="text-[11px] text-slate-500 mt-0.5 truncate">Buka halaman form input nilai risiko</div>
+              <div class="text-xs font-bold text-slate-900 group-hover:text-[#e03c22] transition">Catat Penilaian Risiko</div>
+              <div class="text-[11px] text-slate-500 mt-0.5 truncate">Input nilai risiko kejadian baru</div>
             </div>
           </div>
           <svg class="w-4 h-4 text-slate-400 group-hover:text-[#e03c22] shrink-0 transition" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -284,7 +285,7 @@
           </svg>
         </a>
 
-        <!-- Quick Action 2: Buka Form Pembaruan (PBI-014) -->
+        <!-- Quick Action 2: Perbarui Penilaian Risiko -->
         <a
           href="{{ route('penilaian-risiko.index', ['tab' => 'sudah_dinilai']) }}"
           class="w-full text-left p-3.5 rounded-xl border border-slate-200/90 hover:border-amber-300 hover:bg-amber-50/40 transition flex items-center justify-between gap-3 group text-decoration-none"
@@ -296,8 +297,8 @@
               </svg>
             </div>
             <div class="min-w-0">
-              <div class="text-xs font-bold text-slate-900">Perbarui Hasil Penilaian</div>
-              <div class="text-[11px] text-slate-500 mt-0.5 truncate">Ubah penilaian sesuai kondisi terbaru</div>
+              <div class="text-xs font-bold text-slate-900 group-hover:text-amber-600 transition">Perbarui Penilaian Risiko</div>
+              <div class="text-[11px] text-slate-500 mt-0.5 truncate">Ubah hasil penilaian sesuai kondisi terbaru</div>
             </div>
           </div>
           <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -305,7 +306,7 @@
           </svg>
         </a>
 
-        <!-- Quick Action 3: Verifikasi -->
+        <!-- Quick Action 3: Kelola & Verifikasi Laporan -->
         <a
           href="{{ route('laporan.index') }}"
           class="w-full text-left p-3.5 rounded-xl border border-slate-200/90 hover:border-blue-200 hover:bg-blue-50/30 transition flex items-center justify-between gap-3 group text-decoration-none"
@@ -317,7 +318,7 @@
               </svg>
             </div>
             <div class="min-w-0">
-              <div class="text-xs font-bold text-slate-900">Kelola & Verifikasi Laporan</div>
+              <div class="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition">Kelola & Verifikasi Laporan</div>
               <div class="text-[11px] text-slate-500 mt-0.5 truncate">Periksa kebenaran laporan masuk</div>
             </div>
           </div>
@@ -326,7 +327,7 @@
           </svg>
         </a>
 
-        <!-- Quick Action 4: Daftar Risiko & Prioritas -->
+        <!-- Quick Action 4: Daftar Prioritas Penanganan -->
         <a
           href="{{ route('penilaian-risiko.index') }}"
           class="w-full text-left p-3.5 rounded-xl border border-slate-200/90 hover:border-emerald-200 hover:bg-emerald-50/30 transition flex items-center justify-between gap-3 group text-decoration-none"
@@ -338,8 +339,8 @@
               </svg>
             </div>
             <div class="min-w-0">
-              <div class="text-xs font-bold text-slate-900">Daftar Risiko & Prioritas</div>
-              <div class="text-[11px] text-slate-500 mt-0.5 truncate">Pantau urutan prioritas penanganan</div>
+              <div class="text-xs font-bold text-slate-900 group-hover:text-emerald-600 transition">Daftar Prioritas Penanganan</div>
+              <div class="text-[11px] text-slate-500 mt-0.5 truncate">Urutan kejadian berdasarkan prioritas penanganan</div>
             </div>
           </div>
           <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">

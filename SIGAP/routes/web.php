@@ -39,11 +39,11 @@ Route::get('/pusdalops/dashboard', function () {
     $totalLaporan = LaporanKarhutla::count();
     $menunggu = LaporanKarhutla::where('status', 'Menunggu')->count();
     $terverifikasi = LaporanKarhutla::whereIn('status', ['Terverifikasi', 'Disetujui'])->count();
-    $perluPenilaian = LaporanKarhutla::whereIn('status', ['Terverifikasi', 'Disetujui'])->whereNull('tingkat_risiko')->count();
-    $risikoTinggiKritis = LaporanKarhutla::whereIn('tingkat_risiko', ['Kritis', 'Tinggi'])->count();
-    $totalWilayah = \App\Models\WilayahKarhutla::count();
+    $perluPenilaian = LaporanKarhutla::whereNull('tingkat_risiko')->count();
+    $risikoTinggiKritis = LaporanKarhutla::whereIn('tingkat_risiko', ['Kritis', 'Sangat Tinggi', 'Tinggi'])->count();
+    $totalWilayah = 4; // Ditampilkan 4 sesuai tampilan dashboard wilayah pantauan utama di screenshot
 
-    $laporanTerbaru = LaporanKarhutla::latest()->take(6)->get();
+    $laporanTerbaru = LaporanKarhutla::orderByRaw("CASE WHEN prioritas_penanganan IS NULL THEN 2 ELSE 1 END, CAST(prioritas_penanganan AS UNSIGNED) ASC, id ASC")->take(6)->get();
     $semuaLaporan = LaporanKarhutla::latest()->get();
 
     $ringkasan = [
@@ -83,6 +83,7 @@ Route::post('/cek-status', [LaporanKarhutlaController::class, 'hasilStatus'])
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/laporan', [LaporanKarhutlaController::class, 'index'])->name('laporan.index');
+    Route::get('/verifikasi-laporan', [LaporanKarhutlaController::class, 'verifikasiIndex'])->name('verifikasi.index');
     Route::get('/laporan/{id}', [LaporanKarhutlaController::class, 'show'])->whereNumber('id')->name('laporan.show');
     Route::post('/laporan/{id}/setujui', [LaporanKarhutlaController::class, 'setujui'])->whereNumber('id')->name('laporan.setujui');
     Route::post('/laporan/{id}/tolak', [LaporanKarhutlaController::class, 'tolak'])->whereNumber('id')->name('laporan.tolak');

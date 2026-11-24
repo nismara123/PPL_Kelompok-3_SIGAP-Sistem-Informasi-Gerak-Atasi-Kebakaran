@@ -15,7 +15,7 @@ class WilayahKarhutlaController extends Controller
      */
     public function index(): View
     {
-        $wilayah = WilayahKarhutla::latest()->get();
+        $wilayah = WilayahKarhutla::orderBy('id', 'asc')->get();
 
         return view('wilayah.index', compact('wilayah'));
     }
@@ -95,5 +95,19 @@ class WilayahKarhutlaController extends Controller
         return redirect()
             ->route('wilayah.index')
             ->with('success', 'Data wilayah berhasil diperbarui.');
+    }
+
+    /**
+     * Menghapus data wilayah pantauan.
+     */
+    public function destroy(int $id): RedirectResponse
+    {
+        $wilayah = WilayahKarhutla::findOrFail($id);
+        $kecamatan = $wilayah->kecamatan;
+        $wilayah->delete();
+
+        return redirect()
+            ->route('wilayah.index')
+            ->with('success', "Data wilayah {$kecamatan} berhasil dihapus.");
     }
 }
