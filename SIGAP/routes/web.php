@@ -68,6 +68,7 @@ Route::get('/rr/dashboard', function () {
 
 require __DIR__.'/fsi02.php';
 require __DIR__.'/fsi05.php';
+require __DIR__.'/fsi06.php';
 
 Route::get('/laporan/create', [LaporanKarhutlaController::class, 'create'])
     ->name('laporan.create');
