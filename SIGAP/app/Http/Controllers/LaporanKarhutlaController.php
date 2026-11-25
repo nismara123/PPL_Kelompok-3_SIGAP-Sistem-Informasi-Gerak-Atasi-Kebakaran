@@ -101,9 +101,21 @@ class LaporanKarhutlaController extends Controller
             });
         }
 
-        // Fitur filter status
-        if ($request->filled('status') && $request->status !== 'semua') {
-            $query->where('status', $request->status);
+        // Mode halaman: 'verifikasi' (Verifikasi Laporan) atau default (Daftar Laporan)
+        $mode = $request->query('mode') === 'verifikasi' ? 'verifikasi' : 'daftar';
+
+        // Fitur filter status (pada mode verifikasi default-nya "Menunggu")
+        $statusFilter = $request->input('status');
+        if ($mode === 'verifikasi' && !$request->has('status')) {
+            $statusFilter = 'Menunggu';
+        }
+
+        if (!empty($statusFilter) && $statusFilter !== 'semua') {
+            if (in_array($statusFilter, ['Terverifikasi', 'Disetujui'])) {
+                $query->whereIn('status', ['Terverifikasi', 'Disetujui']);
+            } else {
+                $query->where('status', $statusFilter);
+            }
         }
 
         $laporans = $query->latest()->paginate(10)->withQueryString();
@@ -111,7 +123,7 @@ class LaporanKarhutlaController extends Controller
         $ringkasan = [
             'total' => LaporanKarhutla::count(),
             'menunggu' => LaporanKarhutla::where('status', 'Menunggu')->count(),
-            'disetujui' => LaporanKarhutla::where('status', 'Disetujui')->count(),
+            'disetujui' => LaporanKarhutla::whereIn('status', ['Terverifikasi', 'Disetujui'])->count(),
             'ditolak' => LaporanKarhutla::where('status', 'Ditolak')->count(),
         ];
 
@@ -124,7 +136,7 @@ class LaporanKarhutlaController extends Controller
             ]);
         }
 
-        return view('laporan.index', compact('laporans', 'ringkasan'));
+        return view('laporan.index', compact('laporans', 'ringkasan', 'mode', 'statusFilter'));
     }
 
     // PBI-010: Menampilkan rincian detail satu laporan (Acceptance Criteria 2)

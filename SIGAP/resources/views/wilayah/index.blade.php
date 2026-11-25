@@ -17,7 +17,10 @@
     </div>
 
     <div class="flex items-center gap-2">
-      <span class="px-3.5 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-700 shadow-2xs">
+      <a href="{{ route('wilayah.create') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#e03c22] hover:bg-[#c8321b] text-white text-xs font-bold shadow-sm transition">
+        <span class="text-base leading-none">+</span> Tambah Wilayah
+      </a>
+      <span class="px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 shadow-2xs">
         Total: {{ count($wilayah) }} Wilayah Pantauan
       </span>
     </div>
@@ -33,7 +36,7 @@
   @endif
 
   <!-- Wilayah Cards Grid (Banyak Titik Wilayah Rawan Karhutla Sesuai Request) -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-5">
     @php
       // Mapping data riil kejadian karhutla untuk masing-masing kecamatan di Banyumas
       $wilayahDataMap = [
@@ -160,10 +163,10 @@
         };
 
         $priorityBadge = match($priority) {
-          1 => '<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-red-600 text-white">Prioritas 1</span>',
-          2 => '<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-500 text-white">Prioritas 2</span>',
-          3 => '<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-blue-600 text-white">Prioritas 3</span>',
-          4 => '<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-600 text-white">Prioritas 4</span>',
+          1 => '<span class="inline-flex items-center whitespace-nowrap px-2.5 py-1 rounded-lg text-[11px] font-bold bg-red-600 text-white">Prioritas 1</span>',
+          2 => '<span class="inline-flex items-center whitespace-nowrap px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-500 text-white">Prioritas 2</span>',
+          3 => '<span class="inline-flex items-center whitespace-nowrap px-2.5 py-1 rounded-lg text-[11px] font-bold bg-blue-600 text-white">Prioritas 3</span>',
+          4 => '<span class="inline-flex items-center whitespace-nowrap px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-600 text-white">Prioritas 4</span>',
           default => '<span class="text-[11px] font-medium text-slate-400">Menunggu</span>'
         };
 
@@ -171,7 +174,7 @@
         $lng = $w->longitude ?? '109.2000';
       @endphp
 
-      <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-[0_1px_3px_rgba(15,23,42,0.03)] flex flex-col justify-between space-y-4 hover:border-slate-300 transition">
+      <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-[0_1px_3px_rgba(15,23,42,0.03)] flex flex-col justify-between gap-4 hover:border-slate-300 transition">
         <div class="space-y-2">
           <div class="flex items-center justify-between gap-2">
             <span class="text-xs font-bold text-slate-900">{{ $w->kecamatan }}</span>
@@ -185,15 +188,15 @@
           </div>
         </div>
 
-        <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+        <div class="pt-3.5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
           {!! $priorityBadge !!}
-          <a
-            href="{{ route('penilaian-risiko.index') }}"
-            class="text-xs font-semibold text-[#e03c22] hover:underline inline-flex items-center gap-1 text-decoration-none"
-          >
-            <span>Form Penilaian</span>
-            <span aria-hidden="true">&rarr;</span>
-          </a>
+          <div class="flex items-center gap-2 whitespace-nowrap">
+            <a href="{{ route('wilayah.show', $w->id) }}" class="px-2.5 py-1 rounded-lg border border-slate-200 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 transition">Detail</a>
+            <a href="{{ route('wilayah.edit', $w->id) }}" class="px-2.5 py-1 rounded-lg border border-amber-200 bg-amber-50 text-[11px] font-semibold text-amber-800 hover:bg-amber-100 transition">Edit</a>
+            <a href="{{ route('penilaian-risiko.index') }}" class="text-xs font-semibold text-[#e03c22] hover:underline inline-flex items-center gap-1 ml-1 whitespace-nowrap">
+              <span>Form Penilaian</span><span aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
         </div>
       </div>
     @empty

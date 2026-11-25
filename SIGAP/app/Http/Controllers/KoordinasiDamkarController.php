@@ -14,25 +14,54 @@ class KoordinasiDamkarController extends Controller
      * Menampilkan daftar permintaan koordinasi.
      * PBI-016 dan PBI-017.
      */
-    public function index()
+    public function index(Request $request)
     {
         if (!auth()->check() || !in_array(auth()->user()->role, ['pusdalops', 'damkar'])) {
             abort(403, 'Akses ditolak.');
         }
 
-        $query = KoordinasiDamkar::with([
+        // Query dasar: Damkar hanya melihat permintaan miliknya sendiri.
+        $dasar = KoordinasiDamkar::query();
+
+        if (auth()->user()->role === 'damkar') {
+            $dasar->where('petugas_damkar_id', auth()->id());
+        }
+
+        // Ringkasan untuk kartu statistik.
+        $ringkasan = [
+            'total' => (clone $dasar)->count(),
+            'menunggu' => (clone $dasar)->where('status', 'Menunggu Konfirmasi')->count(),
+            'diterima' => (clone $dasar)->where('status', 'Diterima')->count(),
+            'ditolak' => (clone $dasar)->where('status', 'Ditolak')->count(),
+        ];
+
+        $query = (clone $dasar)->with([
             'laporan',
             'petugasDamkar',
             'petugasBpbd'
         ])->latest();
 
-        if (auth()->user()->role === 'damkar') {
-            $query->where('petugas_damkar_id', auth()->id());
+        // Filter status.
+        if ($request->filled('status') && $request->status !== 'semua') {
+            $query->where('status', $request->status);
         }
 
-        $koordinasi = $query->paginate(10);
+        // Pencarian kode laporan, lokasi, atau nama petugas Damkar.
+        if ($request->filled('q')) {
+            $kata = $request->q;
+            $query->where(function ($q) use ($kata) {
+                $q->whereHas('laporan', function ($l) use ($kata) {
+                    $l->where('kode_laporan', 'like', "%{$kata}%")
+                      ->orWhere('lokasi', 'like', "%{$kata}%");
+                })->orWhereHas('petugasDamkar', function ($u) use ($kata) {
+                    $u->where('name', 'like', "%{$kata}%");
+                });
+            });
+        }
 
-        return view('koordinasi-damkar.index', compact('koordinasi'));
+        $koordinasi = $query->paginate(10)->withQueryString();
+
+        return view('koordinasi-damkar.index', compact('koordinasi', 'ringkasan'));
     }
 
     /**
@@ -130,38 +159,6 @@ class KoordinasiDamkarController extends Controller
                 'success',
                 'Permintaan penanganan berhasil dikirim kepada petugas Damkar. Tingkat risiko: ' . $prioritas . '.'
             );
-    }
-
-    /**
-     * Memperbarui status permintaan koordinasi.
-     * PBI-017.
-     */
-    public function updateStatus(Request $request, $id)
-    {
-        if (!auth()->check() || auth()->user()->role !== 'pusdalops') {
-            abort(403, 'Akses ditolak. Hanya Pusdalops yang dapat memperbarui status permintaan.');
-        }
-
-        $validated = $request->validate([
-            'status' => 'required|in:Menunggu Konfirmasi,Diterima,Ditolak',
-        ]);
-
-        $koordinasi = KoordinasiDamkar::findOrFail($id);
-
-        // Pusdalops tidak boleh menimpa keputusan Damkar.
-        if ($koordinasi->waktu_konfirmasi !== null) {
-            return redirect()
-                ->route('koordinasi-damkar.index')
-                ->with('error', 'Status tidak dapat diubah karena sudah dikonfirmasi oleh Damkar.');
-        }
-
-        $koordinasi->update([
-            'status' => $validated['status'],
-        ]);
-
-        return redirect()
-            ->route('koordinasi-damkar.index')
-            ->with('success', 'Status permintaan koordinasi berhasil diperbarui.');
     }
 
     /**
