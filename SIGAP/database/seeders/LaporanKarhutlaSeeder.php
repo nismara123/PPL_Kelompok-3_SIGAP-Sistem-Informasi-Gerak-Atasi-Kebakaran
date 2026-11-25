@@ -9,7 +9,7 @@ class LaporanKarhutlaSeeder extends Seeder
 {
     public function run(): void
     {
-        LaporanKarhutla::truncate();
+        LaporanKarhutla::query()->delete();
 
         $data = [
             [

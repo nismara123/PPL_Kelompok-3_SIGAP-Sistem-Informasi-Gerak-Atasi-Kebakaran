@@ -59,11 +59,31 @@ Route::get('/pusdalops/dashboard', function () {
 })->middleware('auth')->name('pusdalops.dashboard');
 
 Route::get('/damkar/dashboard', function () {
-    return view('petugas.damkar.dashboard');
+    $dasar = \App\Models\KoordinasiDamkar::where('petugas_damkar_id', auth()->id());
+
+    $ringkasan = [
+        'total' => (clone $dasar)->count(),
+        'menunggu' => (clone $dasar)->where('status', 'Menunggu Konfirmasi')->count(),
+        'diterima' => (clone $dasar)->where('status', 'Diterima')->count(),
+        'prioritas_tinggi' => (clone $dasar)->where('prioritas', 'Tinggi')->count(),
+    ];
+
+    $koordinasiTerbaru = (clone $dasar)->with(['laporan', 'petugasBpbd'])->latest()->take(5)->get();
+
+    return view('petugas.damkar.dashboard', compact('ringkasan', 'koordinasiTerbaru'));
 })->middleware('auth')->name('damkar.dashboard');
 
 Route::get('/rr/dashboard', function () {
-    return view('petugas.rr.dashboard');
+    $ringkasan = [
+        'total' => \App\Models\KerusakanLahan::count(),
+        'luas' => (float) \App\Models\KerusakanLahan::sum('luas_ha'),
+        'wilayah' => \App\Models\KerusakanLahan::distinct('wilayah_id')->count('wilayah_id'),
+        'jenis' => \App\Models\KerusakanLahan::distinct('jenis_kerusakan')->count('jenis_kerusakan'),
+    ];
+
+    $dataTerbaru = \App\Models\KerusakanLahan::latest()->take(5)->get();
+
+    return view('petugas.rr.dashboard', compact('ringkasan', 'dataTerbaru'));
 })->middleware('auth')->name('rr.dashboard');
 
 require __DIR__.'/fsi02.php';

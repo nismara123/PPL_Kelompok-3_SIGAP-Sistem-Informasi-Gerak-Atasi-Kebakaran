@@ -23,15 +23,6 @@ Route::middleware(['auth'])->group(function () {
 
 
     // ==========================================
-    // PBI-017: Melihat dan Memperbarui Status
-    // ==========================================
-
-    // Memperbarui status permintaan koordinasi
-    Route::patch('/koordinasi-damkar/{id}/status', [KoordinasiDamkarController::class, 'updateStatus'])
-        ->name('koordinasi-damkar.update-status');
-
-
-    // ==========================================
     // PBI-018: Konfirmasi dan Penentuan Tim Damkar
     // ==========================================
 
