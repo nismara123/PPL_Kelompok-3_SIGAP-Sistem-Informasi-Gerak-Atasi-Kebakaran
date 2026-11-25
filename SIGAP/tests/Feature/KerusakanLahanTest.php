@@ -38,7 +38,7 @@ class KerusakanLahanTest extends TestCase
         $rr = $this->user('rr');
         $item = KerusakanLahan::create($this->data());
 
-        $this->actingAs($rr)->get('/kerusakan-lahan')->assertOk()->assertSee('fsi02.css')->assertSee('Dusun Uji')->assertSee('Total data tercatat');
+        $this->actingAs($rr)->get('/kerusakan-lahan')->assertOk()->assertDontSee('fsi02.css')->assertSee('Dusun Uji')->assertSee('Total data tercatat');
         $this->actingAs($rr)->get('/kerusakan-lahan/create')->assertOk()->assertSee('Kondisi Kerusakan');
         $this->actingAs($rr)->get("/kerusakan-lahan/{$item->id}")->assertOk()->assertSee('Luas terdampak');
         $this->actingAs($rr)->get("/kerusakan-lahan/{$item->id}/edit")->assertOk();
@@ -86,5 +86,35 @@ class KerusakanLahanTest extends TestCase
     public function test_tamu_diarahkan_ke_login(): void
     {
         $this->get('/kerusakan-lahan')->assertRedirect('/login');
+    }
+
+    public function test_menu_sidebar_tampil_sesuai_role(): void
+    {
+        $this->actingAs($this->user('rr'))->get('/kerusakan-lahan')->assertOk()->assertSee('Data Kerusakan Lahan')->assertSee(route('kerusakan-lahan.index'));
+        $this->actingAs($this->user('pusdalops'))->get('/kerusakan-lahan')->assertOk()->assertSee(route('kerusakan-lahan.index'));
+        // Damkar tidak berhak, jadi tidak ada menu ke modul ini
+        $this->actingAs($this->user('damkar'))->get('/koordinasi-damkar')->assertDontSee(route('kerusakan-lahan.index'));
+    }
+
+    public function test_tampilan_memakai_tailwind_bukan_bootstrap(): void
+    {
+        $rr = $this->user('rr');
+        $item = KerusakanLahan::create($this->data());
+
+        foreach (['/kerusakan-lahan', '/kerusakan-lahan/create', "/kerusakan-lahan/{$item->id}", "/kerusakan-lahan/{$item->id}/edit"] as $url) {
+            $this->actingAs($rr)->get($url)->assertOk()
+                ->assertDontSee('form-control', false)
+                ->assertDontSee('d-flex', false)
+                ->assertDontSee('kl-card', false);
+        }
+    }
+
+    public function test_detail_menampilkan_lokasi_kejadian_dan_wilayah(): void
+    {
+        $pd = $this->user('pusdalops');
+        $item = KerusakanLahan::create($this->data(['lokasi' => 'Blok Utara Lereng']));
+
+        $this->actingAs($pd)->get("/kerusakan-lahan/{$item->id}")->assertOk()
+            ->assertSee('Blok Utara Lereng')->assertSee('Baturraden')->assertSee('Karangsalam')->assertSee('Hutan');
     }
 }

@@ -55,6 +55,7 @@
         'pusdalops' => [
             ['label' => 'Dashboard', 'icon' => $iconDashboard, 'href' => route('pusdalops.dashboard'), 'active' => request()->routeIs('pusdalops.dashboard')],
             ['label' => 'Data Wilayah Karhutla', 'icon' => $iconWilayah, 'href' => route('wilayah.index'), 'active' => request()->routeIs('wilayah.*')],
+            ['label' => 'Data Kerusakan Lahan', 'icon' => $iconLahan, 'href' => route('kerusakan-lahan.index'), 'active' => request()->routeIs('kerusakan-lahan.*')],
             ['label' => 'Laporan Karhutla', 'icon' => $iconLaporan, 'href' => route('laporan.index'), 'active' => $isMenuLaporan],
             ['label' => 'Verifikasi Laporan', 'icon' => $iconVerif, 'href' => route('laporan.index', ['mode' => 'verifikasi']), 'active' => $isMenuVerifikasi],
             ['label' => 'Penilaian Risiko', 'icon' => $iconRisiko, 'href' => route('penilaian-risiko.index'), 'active' => request()->routeIs('penilaian-risiko.*'), 'badge' => $unassessedCount],
