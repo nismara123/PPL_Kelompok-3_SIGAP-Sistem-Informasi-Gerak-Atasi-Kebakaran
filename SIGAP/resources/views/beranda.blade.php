@@ -143,13 +143,12 @@
         }
 
         .hero-image {
-            min-height: 300px;
+            min-height: 380px;
             border-radius: 15px;
             background:
-                linear-gradient(135deg, rgba(20,83,45,.15), rgba(20,83,45,.4)),
-                url('https://images.unsplash.com/photo-1511497584788-876760111969?w=1000')
-                center/cover;
-            box-shadow: 0 8px 25px rgba(20,83,45,.12);
+                linear-gradient(rgba(20, 40, 25, 0.10), rgba(20, 40, 25, 0.10)),
+                url('/images/karhutla-hero.png') center/cover no-repeat;
+            box-shadow: 0 8px 25px rgba(20, 83, 45, 0.12);
         }
 
         .info-strip {
@@ -454,6 +453,88 @@
             background: #fff0ed;
             color: #a92e20;
         }
+
+
+/* ===== LAYOUT FULL WIDTH ===== */
+
+/* Navbar memenuhi lebar layar */
+.navbar {
+    max-width: none;
+    width: 100%;
+    padding: 15px clamp(24px, 4vw, 65px);
+}
+
+/* Semua section menggunakan lebar layar */
+.container {
+    max-width: none;
+    width: 100%;
+    padding: 35px clamp(24px, 4vw, 65px);
+}
+
+/* Footer memenuhi lebar layar */
+.footer-content {
+    max-width: none;
+    width: 100%;
+    padding: 0 clamp(24px, 4vw, 65px);
+}
+
+.copyright {
+    max-width: none;
+    width: 100%;
+    padding-left: clamp(24px, 4vw, 65px);
+    padding-right: clamp(24px, 4vw, 65px);
+}
+
+/* Hero lebih proporsional */
+.hero {
+    grid-template-columns: 1.1fr .9fr;
+    gap: 55px;
+}
+
+.hero-image {
+    min-height: 380px;
+}
+
+/* Tampilan layar besar */
+@media (min-width: 1400px) {
+    .hero h1 {
+        font-size: 46px;
+    }
+
+    .hero p {
+        font-size: 16px;
+    }
+
+    .section-title h2 {
+        font-size: 27px;
+    }
+
+    .stat-card,
+    .case-card,
+    .education-card {
+        padding: 25px;
+    }
+}
+
+/* Tampilan tablet dan HP tetap responsif */
+@media (max-width: 800px) {
+    .container {
+        padding: 25px 20px;
+    }
+
+    .navbar {
+        padding: 15px 20px;
+    }
+
+    .hero-image {
+        min-height: 280px;
+    }
+
+    .footer-content {
+        padding: 0 20px;
+    }
+}
+
     </style>
 </head>
 
@@ -512,7 +593,7 @@
                     </div>
 
                     <div class="info-strip">
-                        <span>☎ Darurat Bebas Pulsa: 112</span>
+                       
                         <span>✓ Informasi Penanganan Kebakaran</span>
                         <span>◷ Siaga 24 Jam</span>
                     </div>

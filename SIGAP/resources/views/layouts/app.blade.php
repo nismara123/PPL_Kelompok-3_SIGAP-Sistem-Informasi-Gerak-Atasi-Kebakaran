@@ -108,6 +108,97 @@
             line-height: 1.55;
         }
 
+
+/* ================================
+   SIDEBAR SIGAP - PERAPIAN TAMPILAN
+================================ */
+
+/* Bentuk utama sidebar */
+#mobileSidebar {
+    width: 260px;
+    min-width: 260px;
+    background: #fffdfb;
+    border-right: 1px solid #eee9e5;
+    box-shadow: 3px 0 14px rgba(30, 41, 59, 0.035);
+}
+
+/* Area sidebar yang bisa discroll */
+#mobileSidebar > div:first-child {
+    scrollbar-width: thin;
+    scrollbar-color: #dedede transparent;
+}
+
+/* Bagian logo */
+#mobileSidebar > div:first-child > div:first-child {
+    min-height: 96px;
+    padding: 20px;
+}
+
+/* Banner role */
+#mobileSidebar > div:first-child > div:nth-child(2) {
+    padding-top: 16px;
+    padding-bottom: 16px;
+}
+
+/* Area menu */
+#mobileSidebar .nav-item {
+    min-height: 46px;
+    padding: 11px 13px;
+    margin-bottom: 5px;
+    border: 1px solid transparent;
+    border-radius: 11px;
+    text-decoration: none;
+    line-height: 1.45;
+    transition: all 0.2s ease;
+}
+
+/* Menu aktif - warna tetap mengikuti role */
+#mobileSidebar .nav-item[style] {
+    border-color: color-mix(in srgb, currentColor 18%, transparent);
+    box-shadow: 0 3px 8px rgba(15, 23, 42, 0.07);
+}
+
+/* Menu yang bisa diklik saat diarahkan */
+#mobileSidebar .nav-item:not([style]):hover {
+    transform: translateX(3px);
+    background: #f5f5f5;
+}
+
+/* Ikon menu */
+#mobileSidebar .nav-item svg {
+    width: 17px;
+    height: 17px;
+}
+
+/* Menu terkunci */
+#mobileSidebar .select-none {
+    min-height: 44px;
+    padding: 10px 13px;
+    margin-bottom: 5px;
+    border-radius: 11px;
+    opacity: 0.72;
+}
+
+/* Footer sidebar */
+#mobileSidebar > div:last-child {
+    padding: 16px;
+    background: #fffdfb;
+    border-top: 1px solid #eee9e5;
+}
+
+/* Tombol keluar */
+#mobileSidebar form button {
+    min-height: 44px;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+#mobileSidebar form button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(15, 23, 42, 0.06);
+}
+
+
         @media (max-width: 768px) {
             .topbar {
                 padding: 0 16px;
@@ -121,6 +212,49 @@
                 padding: 20px 16px;
             }
         }
+
+        /* FIX SIDEBAR AGAR TETAP DIAM SAAT HALAMAN DI-SCROLL */
+@media (min-width: 1024px) {
+    #mobileSidebar {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        height: 100vh !important;
+        width: 255px;
+        min-width: 255px;
+        z-index: 40;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transition: width .25s ease, min-width .25s ease;
+    }
+
+    /* Area menu bisa scroll sendiri */
+    #mobileSidebar > div:first-child {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    /* Footer tetap di bagian bawah */
+    #mobileSidebar > div:last-child {
+        flex-shrink: 0;
+    }
+
+    /* Geser konten utama mengikuti lebar sidebar */
+    .main-content {
+        margin-left: 255px;
+        width: calc(100% - 255px);
+        transition: margin-left .25s ease, width .25s ease;
+    }
+
+    /* Ketika sidebar dikecilkan */
+    body.sidebar-is-collapsed .main-content {
+        margin-left: 76px;
+        width: calc(100% - 76px);
+    }
+}
     </style>
 
     @stack('styles')

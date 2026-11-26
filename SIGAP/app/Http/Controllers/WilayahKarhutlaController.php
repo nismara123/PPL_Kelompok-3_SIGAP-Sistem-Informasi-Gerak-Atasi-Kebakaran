@@ -31,6 +31,8 @@ class WilayahKarhutlaController extends Controller
     /**
      * Menyimpan data wilayah baru.
      */
+   
+    
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
@@ -42,9 +44,27 @@ class WilayahKarhutlaController extends Controller
             'desa_kelurahan' => 'required|string|max:100',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
+        ], [
+            'kode_kabupaten.required' => 'Kode kabupaten wajib diisi.',
+            'kabupaten.required' => 'Nama kabupaten wajib diisi.',
+            'kode_kecamatan.required' => 'Kode kecamatan wajib diisi.',
+            'kecamatan.required' => 'Nama kecamatan wajib diisi.',
+            'kode_desa.required' => 'Kode desa wajib diisi.',
+            'desa_kelurahan.required' => 'Nama desa/kelurahan wajib diisi.',
+            'latitude.numeric' => 'Latitude harus berupa angka.',
+            'latitude.between' => 'Latitude harus antara -90 sampai 90.',
+            'longitude.numeric' => 'Longitude harus berupa angka.',
+            'longitude.between' => 'Longitude harus antara -180 sampai 180.',
         ]);
 
-        $validated['kode_wilayah'] = 'WIL-' . strtoupper(Str::random(10));
+        // Membuat kode wilayah yang belum digunakan
+        do {
+            $kodeWilayah = 'WIL-' . strtoupper(Str::random(10));
+        } while (
+            WilayahKarhutla::where('kode_wilayah', $kodeWilayah)->exists()
+        );
+
+        $validated['kode_wilayah'] = $kodeWilayah;
 
         WilayahKarhutla::create($validated);
 
@@ -52,6 +72,8 @@ class WilayahKarhutlaController extends Controller
             ->route('wilayah.index')
             ->with('success', 'Data wilayah berhasil ditambahkan.');
     }
+
+
 
     /**
      * Menampilkan detail wilayah berdasarkan ID.
