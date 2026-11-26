@@ -94,21 +94,53 @@
 
 <aside id="mobileSidebar" class="fixed lg:sticky top-0 left-0 z-40 h-screen w-64 bg-white border-r border-slate-200/80 flex flex-col justify-between transition-transform duration-200 -translate-x-full lg:translate-x-0 shrink-0">
   <div class="overflow-y-auto">
-    <!-- Brand Header -->
-    <div class="px-5 py-4 border-b border-slate-100 flex items-center gap-3">
-      <div class="w-11 h-11 rounded-xl text-white flex items-center justify-center shrink-0 shadow-sm" style="background: {{ $theme['ac'] }}">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.5 3.2 5 5.6 5 9.2a5 5 0 11-10 0c0-1.6.7-3.2 1.8-4.7.3 1.4 1.2 2.2 2.2 2.5-.4-2.3.1-4.8 1-7z" />
+   
+<!-- Brand Header -->
+<div class="sidebar-brand-header flex items-center gap-3 px-3 py-4 border-b border-slate-100">
+
+    <!-- Logo -->
+    <div class="flex items-center justify-center text-white shadow-sm w-11 h-11 rounded-xl shrink-0"
+         style="background: {{ $theme['ac'] }}">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor"
+             stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 3c2.5 3.2 5 5.6 5 9.2a5 5 0 11-10 0c0-1.6.7-3.2 1.8-4.7.3 1.4 1.2 2.2 2.2 2.5-.4-2.3.1-4.8 1-7z" />
         </svg>
-      </div>
-      <div class="min-w-0 flex flex-col justify-center">
-        <div class="text-lg font-extrabold tracking-tight text-slate-900 leading-none">SIGAP</div>
-        <div class="text-[11px] font-medium text-slate-500 mt-1 leading-none whitespace-nowrap">Sistem Informasi Karhutla</div>
-      </div>
     </div>
 
+    <!-- Nama aplikasi -->
+    <div class="flex flex-col justify-center min-w-0 sidebar-brand-text">
+        <div class="text-lg font-extrabold leading-none tracking-tight text-slate-900">
+            SIGAP
+        </div>
+        <div class="text-[11px] font-medium text-slate-500 mt-1 leading-none whitespace-nowrap">
+            Sistem Informasi Karhutla
+        </div>
+    </div>
+
+    <!-- Tombol hamburger -->
+    <button
+        type="button"
+        id="sidebarCollapseBtn"
+        class="ml-auto flex items-center justify-center w-9 h-9 rounded-lg text-slate-600 hover:bg-slate-100 transition shrink-0"
+        aria-label="Kecilkan sidebar"
+        title="Kecilkan sidebar">
+
+        <svg class="w-6 h-6" fill="none" stroke="currentColor"
+             stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+    </button>
+
+</div>
+
+
+    
+    
+
     <!-- Active Role Banner -->
-    <div class="px-5 py-3.5 border-b" style="background: {{ $theme['banner'] }}; border-color: {{ $theme['border'] }}">
+    <div class="sidebar-role-banner px-5 py-3.5 border-b" style="background: {{ $theme['banner'] }}; border-color: {{ $theme['border'] }}">
       <div class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">LOGIN SEBAGAI</div>
       <div class="mt-1.5 flex items-center gap-2 text-xs font-bold" style="color: {{ $theme['ac'] }}">
         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -119,13 +151,13 @@
     </div>
 
     <!-- Navigation Menu -->
-    <div class="px-3.5 py-4 space-y-1">
+    <div class="px-3.5 py-4 <div class="sidebar-menu-heading px-3 pb-1.5 text-[10px] space-y-1">
       <div class="px-3 pb-1.5 text-[10px] font-bold tracking-wider text-slate-400 uppercase">MENU UTAMA</div>
 
       @foreach($menus as $m)
         <a href="{{ $m['href'] }}"
            class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition {{ $m['active'] ? 'font-bold' : 'font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}"
-           @if($m['active']) style="background: {{ $theme['soft'] }}; color: {{ $theme['ac'] }}" @endif>
+           @if($m['active']) style="background: {{ $theme['ac'] }}; color: #ffffff" @endif>
           <span class="flex items-center gap-2.5">
             <svg class="w-4 h-4 shrink-0 {{ $m['active'] ? '' : 'text-slate-400' }}" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="{{ $m['icon'] }}" />
@@ -177,3 +209,320 @@
     </form>
   </div>
 </aside>
+
+<style>
+    /* PERAPIAN TAMPILAN SIDEBAR SIGAP */
+
+    #mobileSidebar {
+        width: 255px;
+        min-width: 255px;
+        background: #fffdfb;
+        border-right: 1px solid #eee8e3;
+        box-shadow: 3px 0 14px rgba(30, 41, 59, 0.04);
+    }
+
+    /* Area menu */
+    #mobileSidebar .nav-item {
+        min-height: 46px;
+        padding: 12px 14px;
+        margin-bottom: 5px;
+        border-radius: 11px;
+        border: 1px solid transparent;
+        font-size: 12px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    /* Menu aktif mengikuti warna role */
+    #mobileSidebar .nav-item[style] {
+        border-color: transparent;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+        font-weight: 700;
+    }
+
+    /* Menu tidak aktif */
+    #mobileSidebar .nav-item:not([style]) {
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    #mobileSidebar .nav-item:not([style]):hover {
+        background: #f5f3f1;
+        transform: translateX(3px);
+    }
+
+    /* Ikon menu */
+    #mobileSidebar .nav-item svg {
+        width: 17px;
+        height: 17px;
+        flex-shrink: 0;
+    }
+
+    /* Menu terkunci */
+    #mobileSidebar .select-none {
+        min-height: 44px;
+        padding: 10px 13px;
+        margin-bottom: 5px;
+        border-radius: 10px;
+        opacity: 0.7;
+    }
+
+    /* Footer sidebar */
+    #mobileSidebar > div:last-child {
+        padding: 16px;
+        background: #fffdfb;
+        border-top: 1px solid #eee8e3;
+    }
+
+    /* Tombol keluar */
+    #mobileSidebar form button {
+        min-height: 44px;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    #mobileSidebar form button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(15, 23, 42, 0.06);
+    }
+
+
+/* FOOTER PROFIL PETUGAS */
+
+#mobileSidebar > div:last-child {
+    padding: 16px 14px;
+    background: #fffdfb;
+    border-top: 1px solid #eee8e3;
+}
+
+/* Nama petugas */
+#mobileSidebar > div:last-child > div:first-child {
+    min-height: 44px;
+    padding: 0 10px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    background: #f8f6f4;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* Ikon profil */
+#mobileSidebar > div:last-child > div:first-child svg {
+    color: #8b969f;
+    width: 17px;
+    height: 17px;
+}
+
+/* Tombol keluar */
+#mobileSidebar form button {
+    min-height: 44px;
+    padding: 11px 13px;
+    border: 1px solid #e8ded8;
+    border-radius: 10px;
+    background: #fff8f5;
+    color: #a94b37;
+    font-size: 12px;
+    font-weight: 700;
+    transition: all .2s ease;
+}
+
+#mobileSidebar form button:hover {
+    background: #fff0eb;
+    border-color: #efc7ba;
+    color: #c03925;
+    transform: translateY(-1px);
+}
+
+
+/* SIDEBAR COLLAPSE */
+#mobileSidebar {
+    transition: width .25s ease, min-width .25s ease;
+    overflow-x: hidden;
+}
+
+#mobileSidebar.sidebar-collapsed {
+    width: 76px !important;
+    min-width: 76px !important;
+}
+
+#mobileSidebar.sidebar-collapsed .sidebar-brand-text,
+#mobileSidebar.sidebar-collapsed .sidebar-role-banner,
+#mobileSidebar.sidebar-collapsed .sidebar-menu-heading,
+#mobileSidebar.sidebar-collapsed .nav-item > span > span,
+#mobileSidebar.sidebar-collapsed .select-none span > span,
+#mobileSidebar.sidebar-collapsed .select-none > svg:last-child,
+#mobileSidebar.sidebar-collapsed > div:last-child > div:first-child span,
+#mobileSidebar.sidebar-collapsed form button span {
+    display: none !important;
+}
+
+#mobileSidebar.sidebar-collapsed .nav-item,
+#mobileSidebar.sidebar-collapsed .select-none {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#mobileSidebar.sidebar-collapsed .nav-item > span,
+#mobileSidebar.sidebar-collapsed .select-none > span {
+    justify-content: center;
+}
+
+#mobileSidebar.sidebar-collapsed > div:first-child > div:first-child {
+    justify-content: center;
+    flex-wrap: wrap;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+#mobileSidebar.sidebar-collapsed > div:last-child > div:first-child,
+#mobileSidebar.sidebar-collapsed form button {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#mobileSidebar.sidebar-collapsed #sidebarCollapseIcon {
+    transform: rotate(180deg);
+}
+
+#sidebarCollapseIcon {
+    transition: transform .25s ease;
+}
+/* Sembunyikan scrollbar sidebar */
+#mobileSidebar > div:first-child {
+    overflow-x: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+#mobileSidebar > div:first-child::-webkit-scrollbar {
+    display: none;
+}
+
+/* Sembunyikan scrollbar horizontal sidebar */
+#mobileSidebar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Memperbaiki posisi tombol hamburger */
+#mobileSidebar .sidebar-brand-header {
+    position: relative;
+    padding-right: 54px;
+    gap: 10px;
+}
+
+#mobileSidebar .sidebar-brand-text {
+    flex: 1;
+    min-width: 0;
+    padding-right: 0;
+}
+
+#mobileSidebar .sidebar-brand-text > div:last-child {
+    white-space: normal;
+    line-height: 1.3;
+}
+
+#mobileSidebar #sidebarCollapseBtn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;
+    width: 32px;
+    height: 32px;
+}
+
+
+/* PERAPIAN SIDEBAR SAAT MENGECIL */
+
+#mobileSidebar.sidebar-collapsed .sidebar-brand-header {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 6px;
+    min-height: 112px;
+}
+
+#mobileSidebar.sidebar-collapsed .sidebar-brand-text {
+    display: none !important;
+}
+
+#mobileSidebar.sidebar-collapsed #sidebarCollapseBtn {
+    position: static;
+    transform: none;
+    margin: 0;
+    width: 34px;
+    height: 34px;
+}
+
+#mobileSidebar.sidebar-collapsed .sidebar-role-banner,
+#mobileSidebar.sidebar-collapsed .sidebar-menu-heading {
+    display: none !important;
+}
+
+#mobileSidebar.sidebar-collapsed .nav-item {
+    justify-content: center;
+    padding: 12px 0;
+    min-height: 46px;
+}
+
+#mobileSidebar.sidebar-collapsed .nav-item > span {
+    justify-content: center;
+    gap: 0;
+}
+
+#mobileSidebar.sidebar-collapsed .nav-item > span > span {
+    display: none !important;
+}
+
+#mobileSidebar.sidebar-collapsed .select-none {
+    justify-content: center;
+}
+
+#mobileSidebar.sidebar-collapsed .select-none > span {
+    justify-content: center;
+}
+
+#mobileSidebar.sidebar-collapsed > div:last-child {
+    padding: 12px 6px;
+}
+
+#mobileSidebar.sidebar-collapsed form button {
+    justify-content: center;
+    padding: 10px 0;
+}
+
+
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const sidebar = document.getElementById('mobileSidebar');
+    const button = document.getElementById('sidebarCollapseBtn');
+
+    if (!sidebar || !button) return;
+
+    button.addEventListener('click', function () {
+        sidebar.classList.toggle('sidebar-collapsed');
+        document.body.classList.toggle(
+    'sidebar-is-collapsed',
+    sidebar.classList.contains('sidebar-collapsed')
+);
+        const isCollapsed = sidebar.classList.contains('sidebar-collapsed');
+
+        button.setAttribute(
+            'aria-label',
+            isCollapsed ? 'Buka sidebar' : 'Kecilkan sidebar'
+        );
+
+        button.setAttribute(
+            'title',
+            isCollapsed ? 'Buka sidebar' : 'Kecilkan sidebar'
+        );
+    });
+});
+</script>

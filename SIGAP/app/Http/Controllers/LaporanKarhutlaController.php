@@ -21,7 +21,7 @@ class LaporanKarhutlaController extends Controller
             'lokasi' => 'required|string|max:255',
             'waktu_kejadian' => 'required|date',
             'deskripsi' => 'required|string',
-            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
         // Membuat kode laporan unik
@@ -140,8 +140,7 @@ class LaporanKarhutlaController extends Controller
     }
 
     // PBI-010: Menampilkan rincian detail satu laporan (Acceptance Criteria 2)
-    public function show(Request $request, $id)
-    {
+public function show(Request $request, int $id)    {
         $laporan = LaporanKarhutla::findOrFail($id);
 
         if ($request->wantsJson() || $request->is('api/*')) {
@@ -153,20 +152,21 @@ class LaporanKarhutlaController extends Controller
         }
 
         // Pengecekan peran: Hanya Petugas BPBD Pusdalops yang dapat melihat dan menggunakan tombol verifikasi (AC 4)
-        $bisaVerifikasi = auth()->check() && auth()->user()->role === 'pusdalops';
+        $user = $request->user();
+        $bisaVerifikasi = $user !== null && $user->role === 'pusdalops';
 
         return view('laporan.show', compact('laporan', 'bisaVerifikasi'));
     }
 
     // PBI-010 & PBI-011: Menyetujui / Memverifikasi laporan
-    public function setujui(Request $request, $id)
-    {
-        if (!auth()->check() || auth()->user()->role !== 'pusdalops') {
+public function setujui(Request $request, int $id)    {
+        $user = $request->user();
+        if (!$user || $user->role !== 'pusdalops') {
             abort(403, 'Akses ditolak. Tombol ini hanya dapat digunakan oleh Petugas BPBD Pusdalops.');
         }
 
         $laporan = LaporanKarhutla::findOrFail($id);
-        $namaPetugas = auth()->user()->name;
+        $namaPetugas = $user->name;
 
         // Catat ke riwayat perubahan status (PBI-012)
         $riwayat = $laporan->riwayat_status ?? [];
@@ -191,16 +191,19 @@ class LaporanKarhutlaController extends Controller
     }
 
     // PBI-011 & PBI-012: Menolak laporan DENGAN Alasan Penolakan Wajib
-    public function tolak(Request $request, $id)
-    {
-        if (!auth()->check() || auth()->user()->role !== 'pusdalops') {
-            abort(403, 'Akses ditolak. Tombol ini hanya dapat digunakan oleh Petugas BPBD Pusdalops.');
-        }
+   public function tolak(Request $request, int $id)
+{
+    $user = $request->user();
 
-        $laporan = LaporanKarhutla::findOrFail($id);
-        $namaPetugas = auth()->user()->name;
-        $alasan = trim($request->input('alasan_penolakan') ?? 'Laporan ditolak oleh Petugas Pusdalops.');
+    if (!$user || $user->role !== 'pusdalops') {
+        abort(403, 'Akses ditolak. Tombol ini hanya dapat digunakan oleh Petugas BPBD Pusdalops.');
+    }
 
+    $laporan = LaporanKarhutla::findOrFail($id);
+    $namaPetugas = $user->name;
+    $alasan = trim($request->input('alasan_penolakan') ?? 'Laporan ditolak oleh Petugas Pusdalops.');
+
+    // Lanjutkan kode riwayat status yang sudah ada
         // Catat ke riwayat perubahan status (PBI-012)
         $riwayat = $laporan->riwayat_status ?? [];
         $riwayat[] = [
@@ -225,20 +228,22 @@ class LaporanKarhutlaController extends Controller
     }
 
     // PBI-012: Edit/Perbarui Alasan Penolakan
-    public function perbaruiAlasan(Request $request, $id)
-    {
-        if (!auth()->check() || auth()->user()->role !== 'pusdalops') {
-            abort(403, 'Akses ditolak.');
-        }
+   public function perbaruiAlasan(Request $request, int $id)
+{
+    $user = $request->user();
 
-        $request->validate([
-            'alasan_penolakan' => 'required|string|min:5|max:1000',
-        ], [
-            'alasan_penolakan.required' => 'Alasan penolakan tidak boleh kosong.',
-        ]);
+    if (!$user || $user->role !== 'pusdalops') {
+        abort(403, 'Akses ditolak.');
+    }
+
+    $request->validate([
+        'alasan_penolakan' => 'required|string|min:5|max:1000',
+    ], [
+        'alasan_penolakan.required' => 'Alasan penolakan tidak boleh kosong.',
+    ]);
 
         $laporan = LaporanKarhutla::findOrFail($id);
-        $namaPetugas = auth()->user()->name;
+        $namaPetugas = $user->name;
         $alasanBaru = trim($request->alasan_penolakan);
 
         $riwayat = $laporan->riwayat_status ?? [];
@@ -268,8 +273,7 @@ class LaporanKarhutlaController extends Controller
     }
 
     // API: Mengambil detail laporan format JSON
-    public function apiShow(Request $request, $id)
-    {
+public function apiShow(Request $request, int $id)    {
         return $this->show($request, $id);
     }
 }

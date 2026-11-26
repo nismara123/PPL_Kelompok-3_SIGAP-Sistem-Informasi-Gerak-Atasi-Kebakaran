@@ -86,42 +86,62 @@
         font-size: 11px;
     }
 
-    /* Kartu statistik */
-    #view-dashboard #dashboardKpiGrid {
-        display: grid;
-        width: 100%;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 16px;
-    }
+   /* Kartu statistik - ukuran lebih ringkas seperti dashboard RR */
+#view-dashboard #dashboardKpiGrid {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+}
 
-    #view-dashboard #dashboardKpiGrid > a {
-        min-width: 0;
-        min-height: 109px;
-        padding: 18px 20px;
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        border: 1px solid #e8edf2;
-        border-radius: 17px;
-        background: #fff;
-        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.035);
-        box-sizing: border-box;
-    }
+#view-dashboard #dashboardKpiGrid > a {
+    min-width: 0;
+    min-height: 88px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border: 1px solid #e8edf2;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+    box-sizing: border-box;
+}
 
-    #view-dashboard #dashboardKpiGrid > a > div:first-child {
-        width: 48px;
-        height: 48px;
-        min-width: 48px;
-        border-radius: 13px;
-    }
+#view-dashboard #dashboardKpiGrid > a > div:first-child {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    border-radius: 12px;
+}
 
-    #view-dashboard #dashboardKpiGrid > a > div:first-child i {
-        font-size: 22px;
-    }
+#view-dashboard #dashboardKpiGrid > a > div:first-child i {
+    font-size: 20px;
+}
 
-    #view-dashboard #dashboardKpiGrid > a > div:last-child {
-        min-width: 0;
-    }
+#view-dashboard #dashboardKpiGrid > a > div:last-child {
+    min-width: 0;
+}
+
+#view-dashboard #dashboardKpiGrid > a > div:last-child > div:first-child {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    line-height: 1.3;
+}
+
+#view-dashboard #dashboardKpiGrid > a > div:last-child > div:nth-child(2) {
+    margin-top: 2px;
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+#view-dashboard #dashboardKpiGrid > a > div:last-child > div:last-child {
+    margin-top: 2px;
+    font-size: 12px;
+    line-height: 1.3;
+}
 
     #view-dashboard #dashboardKpiGrid > a > div:last-child > div:first-child {
         color: #94a3b8;
@@ -433,6 +453,38 @@
             grid-template-columns: 1fr;
         }
     }
+
+    /* Memperkecil tinggi kartu statistik Pusdalops */
+#view-dashboard #dashboardKpiGrid > a {
+    height: 100px !important;
+    min-height: 100px !important;
+    max-height: 100px !important;
+    padding: 12px 16px !important;
+    gap: 12px !important;
+    align-items: center !important;
+}
+
+#view-dashboard #dashboardKpiGrid > a > div:first-child {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+}
+
+#view-dashboard #dashboardKpiGrid > a > div:first-child i {
+    font-size: 19px !important;
+}
+
+#view-dashboard #dashboardKpiGrid > a > div:last-child > div:nth-child(2) {
+    font-size: 21px !important;
+}
+
+@media (max-width: 768px) {
+    #view-dashboard #dashboardKpiGrid > a {
+        height: 90px !important;
+        min-height: 90px !important;
+        max-height: 90px !important;
+    }
+}
 
 </style>
 @endpush
